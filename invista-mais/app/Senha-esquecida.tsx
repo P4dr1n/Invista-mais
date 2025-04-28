@@ -1,0 +1,141 @@
+import React, { useState } from 'react';
+import { 
+  View, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  StyleSheet, 
+  SafeAreaView 
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient'; // Para Expo
+import { StackNavigationProp } from '@react-navigation/stack';
+
+// Tipagem para navegação
+type RedefinirSenhaScreenNavigationProp = StackNavigationProp<RootStackParamList, 'RedefinirSenha'>;
+
+interface RedefinirSenhaScreenProps {
+  navigation: RedefinirSenhaScreenNavigationProp;
+}
+
+const RedefinirSenhaScreen = ({ navigation }: RedefinirSenhaScreenProps) => {
+  const [novaSenha, setNovaSenha] = useState('');
+  const [confirmarSenha, setConfirmarSenha] = useState('');
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <LinearGradient
+        colors={['#3B0CC8', '#4F29C4', '#69ACBF', '#9E9783']}
+        locations={[0, 0.33, 0.77, 0.95]}
+        style={styles.background}
+        angle={45}
+        useAngle
+      >
+        <View style={styles.mainContainer}>
+          <Text style={styles.titulo}>REDEFINIR SENHA</Text>
+          
+          <View style={styles.formContainer}>
+            {/* Campo Nova Senha */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>NOVA SENHA:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Digite a nova senha"
+                placeholderTextColor="#999"
+                value={novaSenha}
+                onChangeText={setNovaSenha}
+                secureTextEntry
+              />
+            </View>
+
+            {/* Campo Confirmar Senha */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>CONFIRMAR SENHA:</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Repita a nova senha"
+                placeholderTextColor="#999"
+                value={confirmarSenha}
+                onChangeText={setConfirmarSenha}
+                secureTextEntry
+              />
+            </View>
+
+            {/* Botão Salvar */}
+            <TouchableOpacity 
+              style={styles.botaoSalvar}
+              activeOpacity={0.7}
+              onPress={() => navigation.goBack()}
+            >
+              <Text style={styles.botaoTexto}>SALVAR</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </LinearGradient>
+    </SafeAreaView>
+  );
+};
+
+const styles = StyleSheet.create({
+  // Mantemos os mesmos estilos base da tela anterior
+  container: {
+    flex: 1,
+  },
+  background: {
+    flex: 1,
+  },
+  mainContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    padding: 30,
+  },
+  titulo: {
+    fontSize: 28,
+    fontWeight: '900',
+    textAlign: 'center',
+    color: '#FFF',
+    textShadowColor: 'rgba(0,0,0,0.3)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 5,
+    marginBottom: 40,
+    letterSpacing: 2,
+  },
+  formContainer: {
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    borderRadius: 15,
+    padding: 25,
+    elevation: 10,
+  },
+  inputGroup: {
+    marginBottom: 25,
+  },
+  label: {
+    color: '#FFF',
+    fontSize: 16,
+    marginBottom: 8,
+    fontWeight: '600',
+  },
+  input: {
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    borderRadius: 8,
+    padding: 14,
+    color: '#FFF',
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+  botaoSalvar: {
+    backgroundColor: '#4F29C4',
+    borderRadius: 8,
+    padding: 16,
+    marginTop: 30,
+    alignItems: 'center',
+  },
+  botaoTexto: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: '700',
+  },
+});
+
+export default RedefinirSenhaScreen;
