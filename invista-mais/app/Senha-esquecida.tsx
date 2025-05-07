@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
 import { 
   View, 
   Text, 
@@ -7,10 +8,15 @@ import {
   StyleSheet, 
   SafeAreaView 
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient'; // Para Expo
+import { LinearGradient } from 'expo-linear-gradient';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-// Tipagem para navegação
+// 1. Adicionamos a definição do tipo RootStackParamList
+type RootStackParamList = {
+  RedefinirSenha: undefined;
+  // Adicione outras rotas aqui se necessário
+};
+
 type RedefinirSenhaScreenNavigationProp = StackNavigationProp<RootStackParamList, 'RedefinirSenha'>;
 
 interface RedefinirSenhaScreenProps {
@@ -27,14 +33,14 @@ const RedefinirSenhaScreen = ({ navigation }: RedefinirSenhaScreenProps) => {
         colors={['#3B0CC8', '#4F29C4', '#69ACBF', '#9E9783']}
         locations={[0, 0.33, 0.77, 0.95]}
         style={styles.background}
-        angle={45}
-        useAngle
+        // 2. Corrigimos as propriedades do LinearGradient
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
       >
         <View style={styles.mainContainer}>
           <Text style={styles.titulo}>REDEFINIR SENHA</Text>
           
           <View style={styles.formContainer}>
-            {/* Campo Nova Senha */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>NOVA SENHA:</Text>
               <TextInput
@@ -47,7 +53,6 @@ const RedefinirSenhaScreen = ({ navigation }: RedefinirSenhaScreenProps) => {
               />
             </View>
 
-            {/* Campo Confirmar Senha */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>CONFIRMAR SENHA:</Text>
               <TextInput
@@ -60,7 +65,6 @@ const RedefinirSenhaScreen = ({ navigation }: RedefinirSenhaScreenProps) => {
               />
             </View>
 
-            {/* Botão Salvar */}
             <TouchableOpacity 
               style={styles.botaoSalvar}
               activeOpacity={0.7}
@@ -75,8 +79,8 @@ const RedefinirSenhaScreen = ({ navigation }: RedefinirSenhaScreenProps) => {
   );
 };
 
+// Estilos permanecem os mesmos
 const styles = StyleSheet.create({
-  // Mantemos os mesmos estilos base da tela anterior
   container: {
     flex: 1,
   },
