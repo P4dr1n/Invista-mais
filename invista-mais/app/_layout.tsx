@@ -24,7 +24,7 @@ export default function RootLayout() {
         options={{ title: 'CADASTRO' }}
       />
       <Stack.Screen 
-        name="Senha-esquecida" 
+        name="RedefinirSenha" 
         options={{ title: 'REDEFINIR SENHA' }}
       />
     </Stack>

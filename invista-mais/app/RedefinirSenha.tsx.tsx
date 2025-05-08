@@ -14,6 +14,9 @@ import { StackNavigationProp } from '@react-navigation/stack';
 // 1. Adicionamos a definição do tipo RootStackParamList
 type RootStackParamList = {
   RedefinirSenha: undefined;
+  index: undefined;
+  login: undefined;
+  cadastro: undefined;
   // Adicione outras rotas aqui se necessário
 };
 
