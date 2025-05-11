@@ -1,7 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  StyleSheet,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Alert
+} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../types/types';
 
 type FormData = {
   senha: string;
@@ -10,6 +22,7 @@ type FormData = {
   nome: string;
   sobrenome: string;
   telefone: string;
+  login: string;
   cep: string;
   endereco: string;
   bairro: string;
@@ -49,7 +62,6 @@ const Campo = ({
 
 const Cadastro = () => {
   const [etapa, setEtapa] = useState(1);
-  const [isMounted, setIsMounted] = useState(true);
   const [formData, setFormData] = useState<FormData>({
     senha: '',
     confirmarSenha: '',
@@ -57,6 +69,7 @@ const Cadastro = () => {
     nome: '',
     sobrenome: '',
     telefone: '',
+    login: '',
     cep: '',
     endereco: '',
     bairro: '',
@@ -66,43 +79,62 @@ const Cadastro = () => {
     moraComo: ''
   });
 
-  const navigation = useNavigation();
-
-  useEffect(() => {
-    return () => {
-      setIsMounted(false);
-    };
-  }, []);
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
   const handleChange = (campo: keyof FormData, valor: string) => {
-    if (isMounted) {
-      setFormData(prev => ({
-        ...prev,
-        [campo]: valor
-      }));
-    }
+    setFormData(prev => ({ ...prev, [campo]: valor }));
   };
 
-  const handleSubmit = async () => {
+  const validarEtapa1 = () => {
+    return (
+      formData.nome.length > 2 &&
+      formData.sobrenome.length > 2 &&
+      formData.cpf.length === 11 &&
+      formData.telefone.length >= 10 &&
+      formData.login.includes('@') &&
+      formData.senha.length >= 6 &&
+      formData.senha === formData.confirmarSenha
+    );
+  };
+
+  const handleCadastro = async () => {
     try {
-      const response = await fetch('https://sua-api.com/cadastro', {
+      const dadosParaEnvio = {
+        nome: formData.nome,
+        sobrenome: formData.sobrenome,
+        cpf: formData.cpf,
+        telefone: formData.telefone,
+        email: formData.login,
+        senha: formData.senha,
+        cep: formData.cep,
+        endereco: formData.endereco,
+        numero: formData.numero,
+        bairro: formData.bairro,
+        cidade: formData.cidade,
+        estado: formData.estado,
+        mora_como: formData.moraComo
+      };
+
+      const response = await fetch('http://localhost:3000/cadastro', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(dadosParaEnvio),
       });
 
-      if (!response.ok) throw new Error('Erro no cadastro');
-      
-      if (isMounted) {
-        console.log('Cadastro realizado com sucesso!');
-        navigation.goBack();
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.mensagem || 'Erro ao cadastrar');
       }
-    } catch (error) {
-      if (isMounted) {
-        console.error('Erro:', error);
-      }
+
+      Alert.alert('Sucesso!', 'Cadastro realizado. Verifique seu e-mail para ativar a conta.');
+      navigation.navigate('ValidarEmail', { email: formData.login });
+
+    } catch (error: any) {
+      Alert.alert('Erro', error.message || 'Falha no cadastro');
+      console.error('Erro no cadastro:', error);
     }
   };
 
@@ -216,7 +248,7 @@ const Cadastro = () => {
         </Pressable>
         <Pressable 
           style={styles.botaoEnviar} 
-          onPress={handleSubmit}
+          onPress={handleCadastro}
         >
           <Text style={styles.botaoTexto}>Finalizar Cadastro</Text>
         </Pressable>
@@ -224,20 +256,89 @@ const Cadastro = () => {
     </View>
     </>
   );
+  const renderInput = (
+    label: string,
+    campo: keyof FormData,
+    keyboardType: 'default' | 'numeric' | 'email-address' | 'phone-pad' = 'default',
+    secure = false
+  ) => (
+    <View style={styles.campoContainer}>
+      <Text style={styles.label}>{label}</Text>
+      <TextInput
+        style={styles.input}
+        value={formData[campo]}
+        onChangeText={(text) => handleChange(campo, text)}
+        keyboardType={keyboardType}
+        secureTextEntry={secure}
+        placeholderTextColor="#FFFFFF99"
+      />
+      <View style={styles.linha} />
+    </View>
+  );
 
   return (
     <LinearGradient
       colors={['#3B0CC8', '#4F29C4', '#69ACBF', '#9E9783']}
       style={styles.container}
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Text style={styles.titulo}>Cadastro - Etapa {etapa}</Text>
-        {etapa === 1 ? <Etapa1 /> : <Etapa2 />}
-      </ScrollView>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+        >
+          <Text style={styles.titulo}>Cadastro - Etapa {etapa}</Text>
+
+          {etapa === 1 ? (
+            <>
+              {renderInput('Nome Completo', 'nome')}
+              {renderInput('Sobrenome', 'sobrenome')}
+              {renderInput('CPF', 'cpf', 'numeric')}
+              {renderInput('Telefone', 'telefone', 'phone-pad')}
+              {renderInput('E-mail', 'login', 'email-address')}
+              {renderInput('Senha', 'senha', 'default', true)}
+              {renderInput('Confirmar Senha', 'confirmarSenha', 'default', true)}
+
+              <Pressable
+                style={[styles.botao, !validarEtapa1() && styles.botaoDesabilitado]}
+                onPress={() => setEtapa(2)}
+                disabled={!validarEtapa1()}
+              >
+                <Text style={styles.botaoTexto}>Próxima Etapa</Text>
+              </Pressable>
+            </>
+          ) : (
+            <>
+              {renderInput('CEP', 'cep', 'numeric')}
+              {renderInput('Endereço', 'endereco')}
+              {renderInput('Número', 'numero', 'numeric')}
+              {renderInput('Bairro', 'bairro')}
+              {renderInput('Cidade', 'cidade')}
+              {renderInput('Estado', 'estado')}
+              {renderInput('Mora Como', 'moraComo')}
+
+              <View style={styles.buttonGroup}>
+                <Pressable 
+                  style={styles.botao}
+                  onPress={() => setEtapa(1)}
+                >
+                  <Text style={styles.botaoTexto}>Etapa Anterior</Text>
+                </Pressable>
+                <Pressable 
+                  style={styles.botaoEnviar}
+                  onPress={handleCadastro}
+                >
+                  <Text style={styles.botaoTexto}>Finalizar Cadastro</Text>
+                </Pressable>
+              </View>
+            </>
+          )}
+        </ScrollView>
+      </KeyboardAvoidingView>
     </LinearGradient>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -255,12 +356,13 @@ const styles = StyleSheet.create({
   },
   campoContainer: {
     marginBottom: 25,
+    textAlign: 'center'
   },
   label: {
     color: '#FFF',
     fontSize: 16,
     fontFamily: 'KronaOne-Regular',
-    marginBottom: 8,
+    marginBottom: 8
   },
   input: {
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
@@ -272,12 +374,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderColor: 'rgba(255,255,255,0.2)',
   },
+  linha: { height: 1, backgroundColor: '#FFF', marginTop: 5 },
   botao: {
     backgroundColor: '#4F29C4',
     padding: 15,
     borderRadius: 8,
     marginTop: 20,
-    alignItems: 'center',
+    alignItems: 'center'
   },
   botaoEnviar: {
     backgroundColor: '#69ACBF',
@@ -316,7 +419,17 @@ const styles = StyleSheet.create({
     paddingTop: 14,
     paddingBottom: 14,
     fontFamily: 'KronaOne-Regular',
-  }
+    alignItems: 'center'
+  },
+  botaoDesabilitado: { 
+    backgroundColor: '#666', 
+    opacity: 0.6 
+  },
+  buttonGroup: { 
+    marginTop: 30, 
+    gap: 15, 
+    alignItems: 'center' 
+  },
 });
 
 export default Cadastro;

@@ -18,6 +18,7 @@
     "@expo-google-fonts/kaushan-script": "^0.3.0",
     "@expo-google-fonts/krona-one": "^0.3.0",
     "@expo/vector-icons": "^14.0.2",
+    "@react-native-async-storage/async-storage": "^2.1.2",
     "@react-navigation/bottom-tabs": "^7.2.0",
     "@react-navigation/material-top-tabs": "^7.2.12",
     "@react-navigation/native": "^7.1.8",

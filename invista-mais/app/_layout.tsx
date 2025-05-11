@@ -11,22 +11,12 @@ export default function RootLayout() {
         animation: 'slide_from_right'
       }}
     >
-      <Stack.Screen 
-        name="index" 
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen 
-        name="login" 
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen 
-        name="cadastro" 
-        options={{ title: 'CADASTRO' }}
-      />
-      <Stack.Screen 
-        name="RedefinirSenha" 
-        options={{ title: 'REDEFINIR SENHA' }}
-      />
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="login" options={{ headerShown: false }} />
+      <Stack.Screen name="cadastro" options={{ title: 'CADASTRO' }} />
+      <Stack.Screen name="ValidarEmail" options={{ title: 'VERIFICAÇÃO' }} />
+      <Stack.Screen name="ValidarCodigo" options={{ title: 'CÓDIGO' }} />
+      <Stack.Screen name="RedefinirSenha" options={{ title: 'REDEFINIR SENHA' }} />
     </Stack>
   );
 }
