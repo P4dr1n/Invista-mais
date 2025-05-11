@@ -4,7 +4,6 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 
 type FormData = {
-  login: string;
   senha: string;
   confirmarSenha: string;
   cpf: string;
@@ -45,7 +44,6 @@ const Campo = ({
       keyboardType={keyboardType}
       placeholderTextColor="#FFFFFF99"
     />
-    <View style={styles.linha} />
   </View>
 );
 
@@ -53,7 +51,6 @@ const Cadastro = () => {
   const [etapa, setEtapa] = useState(1);
   const [isMounted, setIsMounted] = useState(true);
   const [formData, setFormData] = useState<FormData>({
-    login: '',
     senha: '',
     confirmarSenha: '',
     cpf: '',
@@ -111,96 +108,106 @@ const Cadastro = () => {
 
   const Etapa1 = () => (
     <>
-      <Campo 
-        label="Nome Completo" 
-        value={formData.nome}
-        onChangeText={(text) => handleChange('nome', text)}
-      />
-      <Campo 
-        label="Sobrenome" 
-        value={formData.sobrenome}
-        onChangeText={(text) => handleChange('sobrenome', text)}
-      />
-      <Campo 
-        label="CPF" 
-        value={formData.cpf}
-        onChangeText={(text) => handleChange('cpf', text)}
-        keyboardType="numeric"
-      />
-      <Campo 
-        label="Telefone/Celular" 
-        value={formData.telefone}
-        onChangeText={(text) => handleChange('telefone', text)}
-        keyboardType="phone-pad"
-      />
-      <Campo 
-        label="Login" 
-        value={formData.login}
-        onChangeText={(text) => handleChange('login', text)}
-      />
-      <Campo 
-        label="Senha" 
-        secureTextEntry
-        value={formData.senha}
-        onChangeText={(text) => handleChange('senha', text)}
-      />
-      <Campo 
-        label="Confirmar Senha" 
-        secureTextEntry
-        value={formData.confirmarSenha}
-        onChangeText={(text) => handleChange('confirmarSenha', text)}
-      />
+      <View style={styles.cadastro}>
+        <Text style={styles.textForm}> Nome Completo </Text>
+        <TextInput style={styles.TextInput}
+          placeholder='Nome Completo...'
+          value={formData.nome}
+          onChangeText={(text) => handleChange('nome', text)}
+        />
+        <Text style={styles.textForm}> Sobrenome</Text>
+        <TextInput style={styles.TextInput}
+          placeholder="Sobrenome..." 
+          value={formData.sobrenome}
+          onChangeText={(text) => handleChange('sobrenome', text)}
+        />
+        <Text style={styles.textForm}> CPF </Text>
+        <TextInput style={styles.TextInput}
+          placeholder="CPF..." 
+          value={formData.cpf}
+          onChangeText={(text) => handleChange('cpf', text)}
+          keyboardType="numeric"
+        />
+        <Text style={styles.textForm}> Telefone/Celular </Text>
+        <TextInput style={styles.TextInput}
+          placeholder="Telefone/Celular..." 
+          value={formData.telefone}
+          onChangeText={(text) => handleChange('telefone', text)}
+          keyboardType="numeric"
+        />
+        <Text style={styles.textForm}> Senha </Text>
+        <TextInput style={styles.TextInput}
+          placeholder="Senha..."
+          secureTextEntry
+          value={formData.senha}
+          onChangeText={(text) => handleChange('senha', text)}
+        />
+        <Text style={styles.textForm}> Confirmar Senha </Text>
+        <TextInput style={styles.TextInput}
+          placeholder="Confirmar Senha..." 
+          value={formData.confirmarSenha}
+          onChangeText={(text) => handleChange('confirmarSenha', text)}
+        />
       
-      <Pressable 
-        style={styles.botao} 
-        onPress={() => setEtapa(2)}
-      >
-        <Text style={styles.botaoTexto}>Próxima Etapa</Text>
-      </Pressable>
+        <Pressable 
+          style={styles.botao} 
+          onPress={() => setEtapa(2)}
+          >
+          <Text style={styles.botaoTexto}>Próxima Etapa</Text>
+        </Pressable>
+      </View>
     </>
   );
 
   const Etapa2 = () => (
     <>
-      <Campo 
-        label="CEP" 
+    <View style={styles.cadastro}>
+      <Text style={styles.textForm}> CEP </Text>
+      <TextInput style={styles.TextInput}
+        placeholder='CEP...'
         value={formData.cep}
         onChangeText={(text) => handleChange('cep', text)}
         keyboardType="numeric"
       />
-      <Campo 
-        label="Endereço" 
+      <Text style={styles.textForm}> Endereço </Text>
+      <TextInput style={styles.TextInput}
+        placeholder="Endereço..." 
         value={formData.endereco}
         onChangeText={(text) => handleChange('endereco', text)}
       />
-      <Campo 
-        label="Número" 
+      <Text style={styles.textForm}> Número </Text>
+      <TextInput style={styles.TextInput} 
+        placeholder="Número..." 
         value={formData.numero}
         onChangeText={(text) => handleChange('numero', text)}
         keyboardType="numeric"
       />
-      <Campo 
-        label="Bairro" 
+      <Text style={styles.textForm}> Bairro </Text>
+      <TextInput style={styles.TextInput} 
+        placeholder="Bairro..." 
         value={formData.bairro}
         onChangeText={(text) => handleChange('bairro', text)}
       />
-      <Campo 
-        label="Cidade" 
+      <Text style={styles.textForm}> Cidade </Text>
+      <TextInput style={styles.TextInput} 
+        placeholder="Cidade..." 
         value={formData.cidade}
         onChangeText={(text) => handleChange('cidade', text)}
       />
-      <Campo 
-        label="Estado" 
+      <Text style={styles.textForm}> Estado </Text>
+      <TextInput style={styles.TextInput} 
+        placeholder="Estado..." 
         value={formData.estado}
         onChangeText={(text) => handleChange('estado', text)}
       />
-      <Campo 
-        label="Mora Como" 
+      <Text style={styles.textForm}> Mora Como </Text>
+      <TextInput style={styles.TextInput} 
+        placeholder="Mora Como..." 
         value={formData.moraComo}
         onChangeText={(text) => handleChange('moraComo', text)}
       />
 
-      <View style={styles.buttonGroup}>
+      <View>
         <Pressable 
           style={styles.botao} 
           onPress={() => setEtapa(1)}
@@ -214,6 +221,7 @@ const Cadastro = () => {
           <Text style={styles.botaoTexto}>Finalizar Cadastro</Text>
         </Pressable>
       </View>
+    </View>
     </>
   );
 
@@ -233,16 +241,16 @@ const Cadastro = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
   },
   scrollContainer: {
-    paddingBottom: 40,
+    paddingBottom: 40
   },
   titulo: {
     color: '#FFF',
     fontSize: 24,
     fontFamily: 'KronaOne-Regular',
     marginBottom: 30,
+    paddingTop: 30,
     textAlign: 'center',
   },
   campoContainer: {
@@ -255,16 +263,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
     color: '#FFF',
     fontSize: 16,
+    borderRadius: 50,
+    width:100,
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
-  },
-  linha: {
-    height: 1,
-    backgroundColor: '#FFF',
-    marginTop: 5,
+    borderColor: 'rgba(255,255,255,0.2)',
   },
   botao: {
     backgroundColor: '#4F29C4',
@@ -280,16 +286,37 @@ const styles = StyleSheet.create({
     marginTop: 20,
     alignItems: 'center',
   },
-  buttonGroup: {
-    marginTop: 30,
-    gap: 15,
-    alignItems: 'center',
-  },
   botaoTexto: {
     color: '#FFF',
     fontSize: 16,
     fontFamily: 'KronaOne-Regular',
   },
+  cadastro: {
+    height: '100%',
+    paddingTop: 30,
+    paddingLeft: 14,
+    paddingRight: 14,
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  textForm: {
+    textAlign: 'justify',
+    paddingBottom: 10,
+    fontFamily: 'KronaOne-Regular',
+  },
+  TextInput: {
+    textAlign: 'justify',
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 8,
+    marginBottom: 16,
+    paddingHorizontal: 8,
+    paddingTop: 14,
+    paddingBottom: 14,
+    fontFamily: 'KronaOne-Regular',
+  }
 });
 
 export default Cadastro;

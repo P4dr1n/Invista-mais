@@ -31,14 +31,14 @@ export default function Login() {
             <TextInput
               style={styles.input}
               placeholder="Login"
-              placeholderTextColor="#999"
+              placeholderTextColor="#d4d4d4"
               value={login}
               onChangeText={setLogin}
             />
             <TextInput
               style={styles.input}
               placeholder="Senha"
-              placeholderTextColor="#999"
+              placeholderTextColor="#d4d4d4"
               secureTextEntry
               value={senha}
               onChangeText={setSenha}
@@ -86,17 +86,23 @@ const styles = StyleSheet.create({
     gap: 25,
   },
   input: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    borderRadius: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 50,
     padding: 15,
-    color: '#FFF',
     fontSize: 16,
+    color: 'black'
   },
   button: {
     backgroundColor: '#4F29C4',
-    borderRadius: 8,
-    padding: 15,
+    borderRadius: 25,
+    width: 264,
+    height: 46,
+    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
+    alignSelf: 'center',
+    paddingHorizontal: 15,
+    paddingVertical: 5,
   },
   buttonText: {
     color: '#FFF',

@@ -15,7 +15,7 @@ export default function Index() {
       <View style={styles.contentContainer}>
         <Image 
           style={styles.logo} 
-          source={{ uri: 'https://placehold.co/138x123' }}
+          source={require('../assets/imagem_logo.jpeg')}
         />
         <Text style={styles.welcomeText}>BEM VINDO A ETERNIDADE</Text>
         
@@ -25,8 +25,8 @@ export default function Index() {
         >
           <Text style={styles.buttonText}>LOGIN</Text>
           <Image
-            style={styles.buttonIcon}
-            source={{ uri: 'https://placehold.co/50x32' }}
+            style={styles.images}
+            source={require('../assets/imagem_login.png')}
           />
         </Pressable>
 
@@ -36,8 +36,8 @@ export default function Index() {
         >
           <Text style={styles.buttonText}>CADASTRAR</Text>
           <Image
-            style={styles.buttonIcon}
-            source={{ uri: 'https://placehold.co/50x31' }}
+            style={styles.images}
+            source={require('../assets/imagem_cadastro.png')}
           />
         </Pressable>
       </View>
@@ -51,6 +51,7 @@ const styles = StyleSheet.create({
     paddingTop: 81,
     paddingBottom: 81,
   },
+
   contentContainer: {
     position: 'absolute',
     top: height * 0.25,
@@ -63,11 +64,13 @@ const styles = StyleSheet.create({
     gap: 48,
     alignItems: 'center',
   },
+
   logo: {
     width: 138,
-    height: 123,
-    borderRadius: 9999,
+    height: 135,
+    borderRadius: 95,
   },
+
   welcomeText: {
     fontSize: 16,
     color: '#fff',
@@ -76,6 +79,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'KronaOne-Regular',
   },
+
   button: {
     backgroundColor: '#bfbfbf',
     borderRadius: 25,
@@ -87,14 +91,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 5,
   },
+  
   buttonText: {
     color: '#000',
     fontSize: 14,
     textAlign: 'center',
+    marginLeft: 10,
     fontFamily: 'KronaOne-Regular',
   },
-  buttonIcon: {
-    height: 32,
-    width: 50,
+
+  images: {
+    height: 25,
+    width: 27,
+    marginRight: 5,
   },
 });
