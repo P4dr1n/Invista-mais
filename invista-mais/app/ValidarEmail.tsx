@@ -1,28 +1,31 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView,Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
-
-type RootStackParamList = {
-  ValidarCodigo: { email: string };
-  RedefinirSenha: undefined;
-  ValidarEmail: undefined;
-  // ... outras rotas
-};
+import { RootStackParamList } from '../types/types';
 
 type ValidarEmailScreenNavigationProp = StackNavigationProp<RootStackParamList, 'ValidarEmail'>;
 
-const ValidarEmailScreen = () => {
-    const navigation = useNavigation<ValidarEmailScreenNavigationProp>();
-    const [email, setEmail] = useState('');
-  
-    const handleEnviarCodigo = () => {
-      // Navegação CORRETA passando o parâmetro
-      navigation.navigate('ValidarCodigo', { 
-        email: email // Passa o email como parâmetro
-      });
-    };
+        const ValidarEmailScreen = () => {
+            const navigation = useNavigation<ValidarEmailScreenNavigationProp>();
+            const [email, setEmail] = useState('');
+          
+            const handleEnviarCodigo = async () => {
+          try {
+            const response = await fetch('http://localhost:3000/verificacao/solicitar-codigo', { // <- Novo caminho
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ email }),
+            });
+
+            if (response.ok) {
+              navigation.navigate('ValidarCodigo', { email });
+            }
+          } catch (error) {
+            Alert.alert('Erro', 'Falha ao enviar código');
+          }
+        };
 
 
   return (

@@ -9,7 +9,7 @@ const ConfirmacaoCadastro = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
   // Simule o email cadastrado (ou receba via contexto/armazenamento)
-  const emailCadastrado = 'usuario@exemplo.com'; 
+  const emailCadastrado = ''; 
 
   return (
     <LinearGradient
@@ -27,9 +27,7 @@ const ConfirmacaoCadastro = () => {
           Não recebeu o e-mail?{' '}
           <Text 
             style={styles.link}
-            onPress={() => navigation.navigate('ValidarEmail', { 
-              email: emailCadastrado // Parâmetro obrigatório
-            })}
+            onPress={() => navigation.navigate('ValidarEmail', { email: emailCadastrado })}
           >
             Reenviar código
           </Text>

@@ -2,7 +2,7 @@
 export type RootStackParamList = {
     index: undefined;
     login: undefined;
-    Cadastro: undefined;
+    cadastro: undefined;
     Home: undefined;
     ConfirmacaoCadastro: undefined;
     ValidarEmail: { email: string };

@@ -1,24 +1,20 @@
 import React, { useState } from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { 
   View, 
   Text, 
   TextInput, 
   TouchableOpacity, 
   StyleSheet, 
-  SafeAreaView 
+  SafeAreaView,
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../types/types';
 
-// 1. Adicionamos a definição do tipo RootStackParamList
-type RootStackParamList = {
-  RedefinirSenha: undefined;
-  index: undefined;
-  login: undefined;
-  cadastro: undefined;
-  // Adicione outras rotas aqui se necessário
-};
+
 
 type RedefinirSenhaScreenNavigationProp = StackNavigationProp<RootStackParamList, 'RedefinirSenha'>;
 
@@ -29,14 +25,58 @@ interface RedefinirSenhaScreenProps {
 const RedefinirSenhaScreen = ({ navigation }: RedefinirSenhaScreenProps) => {
   const [novaSenha, setNovaSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
+  const [loading, setLoading] = useState(false);
+  const route = useRoute();
+  const { email } = route.params as { email: string };
+
+  const handleRedefinirSenha = async () => {
+    try {
+      setLoading(true);
+
+      // Validações
+      if (novaSenha !== confirmarSenha) {
+        Alert.alert('Erro', 'As senhas não coincidem');
+        return;
+      }
+
+      if (novaSenha.length < 6) {
+        Alert.alert('Erro', 'A senha deve ter pelo menos 6 caracteres');
+        return;
+      }
+
+      const response = await fetch('http://localhost:3000/auth/redefinir-senha', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          novaSenha,
+          confirmarSenha
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.mensagem || 'Erro ao redefinir senha');
+      }
+
+      Alert.alert('Sucesso!', 'Senha redefinida com sucesso');
+      navigation.navigate('login');
+
+    } catch (error: any) {
+      Alert.alert('Erro', error.message || 'Falha na redefinição');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <LinearGradient
         colors={['#3B0CC8', '#4F29C4', '#69ACBF', '#9E9783']}
-        locations={[0, 0.33, 0.77, 0.95]}
         style={styles.background}
-        // 2. Corrigimos as propriedades do LinearGradient
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
@@ -69,11 +109,16 @@ const RedefinirSenhaScreen = ({ navigation }: RedefinirSenhaScreenProps) => {
             </View>
 
             <TouchableOpacity 
-              style={styles.botaoSalvar}
+              style={[styles.botaoSalvar, loading && styles.botaoDesabilitado]}
               activeOpacity={0.7}
-              onPress={() => navigation.goBack()}
+              onPress={handleRedefinirSenha}
+              disabled={loading}
             >
-              <Text style={styles.botaoTexto}>SALVAR</Text>
+              {loading ? (
+                <ActivityIndicator color="#FFF" />
+              ) : (
+                <Text style={styles.botaoTexto}>SALVAR</Text>
+              )}
             </TouchableOpacity>
           </View>
         </View>
@@ -106,6 +151,10 @@ const styles = StyleSheet.create({
     textShadowRadius: 5,
     marginBottom: 40,
     letterSpacing: 2,
+  },
+   botaoDesabilitado: {
+    backgroundColor: '#666',
+    opacity: 0.7,
   },
   formContainer: {
     backgroundColor: 'rgba(255,255,255,0.15)',

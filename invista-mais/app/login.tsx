@@ -16,6 +16,7 @@ import { KronaOne_400Regular } from '@expo-google-fonts/krona-one';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -56,11 +57,9 @@ export default function Login() {
         return;
       }
 
-      const response = await fetch('http://localhost:3000/login', {
+      const response = await fetch('http://localhost:3000/auth/login', { // <- Adicionar /auth
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, senha }),
       });
 
@@ -81,8 +80,14 @@ export default function Login() {
 
       // Login bem-sucedido
       await AsyncStorage.setItem('token', data.token);
-      await AsyncStorage.setItem('usuario', JSON.stringify(data.usuario));
-      navigation.navigate('Home');
+      await AsyncStorage.setItem('usuario', JSON.stringify({
+        id: data.usuario.id, // ← Garanta que o backend envia o ID
+        nome: data.usuario.nome,
+        email: data.usuario.email,
+        
+      }))
+
+      router.replace('/home');
 
     } catch (error: any) {
       Alert.alert('Erro', 'Não foi possível conectar ao servidor');
@@ -122,7 +127,7 @@ export default function Login() {
             />
             <TextInput
               placeholderTextColor="#d4d4d4"
-              secureTextEntry
+              
               style={[styles.input, emailError ? styles.inputError : null]}
               placeholder="E-mail"
               value={email}
@@ -174,7 +179,7 @@ export default function Login() {
 
             <TouchableOpacity 
               style={styles.link}
-              onPress={() => navigation.navigate('Cadastro')}
+              onPress={() => navigation.navigate('cadastro')}
             >
               <Text style={styles.linkText}>Criar nova conta</Text>
             </TouchableOpacity>

@@ -1,26 +1,56 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from '@react-navigation/native';
 import { RootStackParamList } from '../types/types';
+import { useLocalSearchParams } from 'expo-router';
 
 type ValidarCodigoScreenProps = {
-    route: { params: { email: string } };
+  route: { params: { email: string } };
+};
+
+const ValidarCodigoScreen = ({ route }: ValidarCodigoScreenProps) => {
+  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const [codigo, setCodigo] = useState('');
+    const email = Array.isArray(route.params.email) 
+    ? route.params.email[0] // Pega o primeiro elemento se for array
+    : route.params.email;
+
+  const handleValidar = async () => {
+    try {
+      // Altere para seu IP real
+      const response = await fetch('http://localhost:3000/verificacao/verificar-codigo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, codigo }),
+      });
+
+      const data = await response.json();
+      
+      if (!response.ok) throw new Error(data.mensagem || 'Erro na verificação');
+      
+      if (data.success) {
+        navigation.navigate('RedefinirSenha', { email });
+      }
+    } catch (error: any) {
+      Alert.alert('Erro', error.message || 'Falha na verificação');
+    }
   };
 
-type Props = {
-    navigation: StackNavigationProp<RootStackParamList, 'ValidarCodigo'>;
-    route: { params: { email: string } };
+  const handleReenviar = async () => {
+    try {
+      await fetch('http://localhost:3000/verificacao/solicitar-codigo', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      Alert.alert('Sucesso', 'Código reenviado!');
+    } catch (error) {
+      Alert.alert('Erro', 'Falha ao reenviar código');
+    }
   };
-  const [codigo, setCodigo] = useState('');
-  const ValidarCodigoScreen = ({ route }: ValidarCodigoScreenProps) => {
-    const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-    const [codigo, setCodigo] = useState('');
-    const { email } = route.params;
-    const handleValidar = () => {
-        navigation.navigate('RedefinirSenha', { email });
-      };
+      
 
       return (
         <SafeAreaView style={styles.container}>

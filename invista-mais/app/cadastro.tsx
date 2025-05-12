@@ -81,7 +81,43 @@ const Cadastro = () => {
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
+  const consultarCEP = async (cep: string) => {
+    try {
+      cep = cep.replace(/\D/g, '');
+      if (cep.length !== 8) return;
+      
+      const response = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const data = await response.json();
+
+      if (data.erro) {
+        Alert.alert('CEP não encontrado');
+        return;
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        endereco: data.logradouro || '',
+        bairro: data.bairro || '',
+        cidade: data.localidade || '',
+        estado: data.uf || ''
+      }));
+
+    } catch (error) {
+      Alert.alert('Erro ao consultar CEP');
+      console.error('Erro na consulta do CEP:', error);
+    }
+  };
+
   const handleChange = (campo: keyof FormData, valor: string) => {
+    // Formatação do CEP
+    if (campo === 'cep') {
+      valor = valor.replace(/\D/g, '')
+                  .replace(/(\d{5})(\d)/, '$1-$2')
+                  .substring(0, 9);
+      
+      if (valor.length === 9) consultarCEP(valor);
+    }
+
     setFormData(prev => ({ ...prev, [campo]: valor }));
   };
 
@@ -115,11 +151,9 @@ const Cadastro = () => {
         mora_como: formData.moraComo
       };
 
-      const response = await fetch('http://localhost:3000/cadastro', {
+      const response = await fetch('http://localhost:3000/auth/cadastro', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dadosParaEnvio),
       });
 
@@ -138,124 +172,6 @@ const Cadastro = () => {
     }
   };
 
-  const Etapa1 = () => (
-    <>
-      <View style={styles.cadastro}>
-        <Text style={styles.textForm}> Nome Completo </Text>
-        <TextInput style={styles.TextInput}
-          placeholder='Nome Completo...'
-          value={formData.nome}
-          onChangeText={(text) => handleChange('nome', text)}
-        />
-        <Text style={styles.textForm}> Sobrenome</Text>
-        <TextInput style={styles.TextInput}
-          placeholder="Sobrenome..." 
-          value={formData.sobrenome}
-          onChangeText={(text) => handleChange('sobrenome', text)}
-        />
-        <Text style={styles.textForm}> CPF </Text>
-        <TextInput style={styles.TextInput}
-          placeholder="CPF..." 
-          value={formData.cpf}
-          onChangeText={(text) => handleChange('cpf', text)}
-          keyboardType="numeric"
-        />
-        <Text style={styles.textForm}> Telefone/Celular </Text>
-        <TextInput style={styles.TextInput}
-          placeholder="Telefone/Celular..." 
-          value={formData.telefone}
-          onChangeText={(text) => handleChange('telefone', text)}
-          keyboardType="numeric"
-        />
-        <Text style={styles.textForm}> Senha </Text>
-        <TextInput style={styles.TextInput}
-          placeholder="Senha..."
-          secureTextEntry
-          value={formData.senha}
-          onChangeText={(text) => handleChange('senha', text)}
-        />
-        <Text style={styles.textForm}> Confirmar Senha </Text>
-        <TextInput style={styles.TextInput}
-          placeholder="Confirmar Senha..." 
-          value={formData.confirmarSenha}
-          onChangeText={(text) => handleChange('confirmarSenha', text)}
-        />
-      
-        <Pressable 
-          style={styles.botao} 
-          onPress={() => setEtapa(2)}
-          >
-          <Text style={styles.botaoTexto}>Próxima Etapa</Text>
-        </Pressable>
-      </View>
-    </>
-  );
-
-  const Etapa2 = () => (
-    <>
-    <View style={styles.cadastro}>
-      <Text style={styles.textForm}> CEP </Text>
-      <TextInput style={styles.TextInput}
-        placeholder='CEP...'
-        value={formData.cep}
-        onChangeText={(text) => handleChange('cep', text)}
-        keyboardType="numeric"
-      />
-      <Text style={styles.textForm}> Endereço </Text>
-      <TextInput style={styles.TextInput}
-        placeholder="Endereço..." 
-        value={formData.endereco}
-        onChangeText={(text) => handleChange('endereco', text)}
-      />
-      <Text style={styles.textForm}> Número </Text>
-      <TextInput style={styles.TextInput} 
-        placeholder="Número..." 
-        value={formData.numero}
-        onChangeText={(text) => handleChange('numero', text)}
-        keyboardType="numeric"
-      />
-      <Text style={styles.textForm}> Bairro </Text>
-      <TextInput style={styles.TextInput} 
-        placeholder="Bairro..." 
-        value={formData.bairro}
-        onChangeText={(text) => handleChange('bairro', text)}
-      />
-      <Text style={styles.textForm}> Cidade </Text>
-      <TextInput style={styles.TextInput} 
-        placeholder="Cidade..." 
-        value={formData.cidade}
-        onChangeText={(text) => handleChange('cidade', text)}
-      />
-      <Text style={styles.textForm}> Estado </Text>
-      <TextInput style={styles.TextInput} 
-        placeholder="Estado..." 
-        value={formData.estado}
-        onChangeText={(text) => handleChange('estado', text)}
-      />
-      <Text style={styles.textForm}> Mora Como </Text>
-      <TextInput style={styles.TextInput} 
-        placeholder="Mora Como..." 
-        value={formData.moraComo}
-        onChangeText={(text) => handleChange('moraComo', text)}
-      />
-
-      <View>
-        <Pressable 
-          style={styles.botao} 
-          onPress={() => setEtapa(1)}
-        >
-          <Text style={styles.botaoTexto}>Etapa Anterior</Text>
-        </Pressable>
-        <Pressable 
-          style={styles.botaoEnviar} 
-          onPress={handleCadastro}
-        >
-          <Text style={styles.botaoTexto}>Finalizar Cadastro</Text>
-        </Pressable>
-      </View>
-    </View>
-    </>
-  );
   const renderInput = (
     label: string,
     campo: keyof FormData,
