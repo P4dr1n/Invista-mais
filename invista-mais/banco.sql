@@ -28,3 +28,17 @@ CREATE TABLE codigos_verificacao (
     utilizado BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (email) REFERENCES usuarios(email) ON DELETE CASCADE
 );
+CREATE TABLE CustoVidaClasseMedia (
+    Ano INT NOT NULL,
+    Regiao VARCHAR(50) NOT NULL,
+    SalarioMedio DECIMAL(10,2) NOT NULL,
+    Habitacao DECIMAL(10,2),
+    Alimentacao DECIMAL(10,2),
+    Transporte DECIMAL(10,2),
+    EducacaoSaude DECIMAL(10,2),
+    Lazer DECIMAL(10,2),
+    Dividas DECIMAL(10,2),
+    PercentualMoradia DECIMAL(5,2),
+    Fonte VARCHAR(100),
+    PRIMARY KEY (Ano, Regiao)
+);

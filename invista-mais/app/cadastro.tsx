@@ -30,6 +30,7 @@ type FormData = {
   cidade: string;
   estado: string;
   moraComo: string;
+  cpfError?: string;
 };
 
 type CampoProps = {
@@ -38,6 +39,7 @@ type CampoProps = {
   onChangeText: (text: string) => void;
   secureTextEntry?: boolean;
   keyboardType?: 'default' | 'numeric' | 'email-address' | 'phone-pad';
+  error?: string;
 };
 
 const Campo = ({ 
@@ -45,18 +47,20 @@ const Campo = ({
   value, 
   onChangeText, 
   secureTextEntry = false,
-  keyboardType = 'default'
+  keyboardType = 'default',
+  error
 }: CampoProps) => (
   <View style={styles.campoContainer}>
     <Text style={styles.label}>{label}</Text>
     <TextInput
-      style={styles.input}
+      style={[styles.input, error ? styles.inputError : null]}
       value={value}
       onChangeText={onChangeText}
       secureTextEntry={secureTextEntry}
       keyboardType={keyboardType}
       placeholderTextColor="#FFFFFF99"
     />
+    {error && <Text style={styles.errorText}>{error}</Text>}
   </View>
 );
 
@@ -76,7 +80,8 @@ const Cadastro = () => {
     numero: '',
     cidade: '',
     estado: '',
-    moraComo: ''
+    moraComo: '',
+    cpfError: ''
   });
 
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
@@ -108,8 +113,29 @@ const Cadastro = () => {
     }
   };
 
-  const handleChange = (campo: keyof FormData, valor: string) => {
-    // Formatação do CEP
+  const validarCPF = async (cpf: string) => {
+    try {
+      const token = process.env.INVERTEXTO_TOKEN;
+      const response = await fetch(
+        `https://api.invertexto.com/v1/validator?token=${token}&value=${cpf}&type=cpf`
+      );
+      
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Erro na validação');
+      }
+
+      return data.valid;
+
+    } catch (error: any) {
+      console.error('Erro na validação do CPF:', error);
+      Alert.alert('Erro', 'Não foi possível validar o CPF');
+      return false;
+    }
+  };
+
+  const handleChange = async (campo: keyof FormData, valor: string) => {
     if (campo === 'cep') {
       valor = valor.replace(/\D/g, '')
                   .replace(/(\d{5})(\d)/, '$1-$2')
@@ -118,7 +144,27 @@ const Cadastro = () => {
       if (valor.length === 9) consultarCEP(valor);
     }
 
-    setFormData(prev => ({ ...prev, [campo]: valor }));
+    if (campo === 'cpf') {
+      valor = valor.replace(/\D/g, '').substring(0, 11);
+      
+      setFormData(prev => ({ 
+        ...prev, 
+        [campo]: valor,
+        cpfError: '' 
+      }));
+
+      if (valor.length === 11) {
+        const valido = await validarCPF(valor);
+        if (!valido) {
+          setFormData(prev => ({
+            ...prev,
+            cpfError: 'CPF inválido'
+          }));
+        }
+      }
+    } else {
+      setFormData(prev => ({ ...prev, [campo]: valor }));
+    }
   };
 
   const validarEtapa1 = () => {
@@ -126,6 +172,7 @@ const Cadastro = () => {
       formData.nome.length > 2 &&
       formData.sobrenome.length > 2 &&
       formData.cpf.length === 11 &&
+      !formData.cpfError &&
       formData.telefone.length >= 10 &&
       formData.login.includes('@') &&
       formData.senha.length >= 6 &&
@@ -135,6 +182,11 @@ const Cadastro = () => {
 
   const handleCadastro = async () => {
     try {
+      if (formData.cpfError) {
+        Alert.alert('Erro', 'CPF inválido');
+        return;
+      }
+
       const dadosParaEnvio = {
         nome: formData.nome,
         sobrenome: formData.sobrenome,
@@ -172,25 +224,21 @@ const Cadastro = () => {
     }
   };
 
-  const renderInput = (
-    label: string,
-    campo: keyof FormData,
-    keyboardType: 'default' | 'numeric' | 'email-address' | 'phone-pad' = 'default',
-    secure = false
-  ) => (
-    <View style={styles.campoContainer}>
-      <Text style={styles.label}>{label}</Text>
-      <TextInput
-        style={styles.input}
-        value={formData[campo]}
-        onChangeText={(text) => handleChange(campo, text)}
-        keyboardType={keyboardType}
-        secureTextEntry={secure}
-        placeholderTextColor="#FFFFFF99"
-      />
-      <View style={styles.linha} />
-    </View>
-  );
+ const renderInput = (
+  label: string,
+  campo: keyof Omit<FormData, 'cpfError'>, // Exclua cpfError dos campos
+  keyboardType: 'default' | 'numeric' | 'email-address' | 'phone-pad' = 'default',
+  secure = false
+) => (
+  <Campo
+    label={label}
+    value={formData[campo] as string} // Type assertion
+    onChangeText={(text) => handleChange(campo, text)}
+    keyboardType={keyboardType}
+    secureTextEntry={secure}
+    error={campo === 'cpf' ? formData.cpfError : undefined}
+  />
+);
 
   return (
     <LinearGradient
@@ -255,6 +303,7 @@ const Cadastro = () => {
     </LinearGradient>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -285,10 +334,20 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     borderRadius: 50,
-    width:100,
+    width: '100%',
     paddingVertical: 8,
     borderBottomWidth: 1,
     borderColor: 'rgba(255,255,255,0.2)',
+  },
+  inputError: {
+    borderColor: '#FF4444',
+    backgroundColor: 'rgba(255, 68, 68, 0.1)'
+  },
+  errorText: {
+    color: '#FF4444',
+    fontSize: 12,
+    marginTop: 4,
+    fontFamily: 'KronaOne-Regular'
   },
   linha: { height: 1, backgroundColor: '#FFF', marginTop: 5 },
   botao: {
