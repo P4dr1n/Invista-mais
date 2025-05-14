@@ -50,18 +50,18 @@ const Campo = ({
   keyboardType = 'default',
   error
 }: CampoProps) => (
-  <View style={styles.campoContainer}>
-    <Text style={styles.label}>{label}</Text>
-    <TextInput
-      style={[styles.input, error ? styles.inputError : null]}
-      value={value}
-      onChangeText={onChangeText}
-      secureTextEntry={secureTextEntry}
-      keyboardType={keyboardType}
-      placeholderTextColor="#FFFFFF99"
-    />
-    {error && <Text style={styles.errorText}>{error}</Text>}
-  </View>
+    <View style={styles.campoContainer}>
+      <Text style={styles.label}>{label}</Text>
+      <TextInput
+        style={[styles.input, error ? styles.inputError : null]}
+        value={value}
+        onChangeText={onChangeText}
+        secureTextEntry={secureTextEntry}
+        keyboardType={keyboardType}
+        placeholderTextColor="#FFFFFF99"
+      />
+      {error && <Text style={styles.errorText}>{error}</Text>}
+    </View>
 );
 
 const Cadastro = () => {
@@ -253,9 +253,9 @@ const Cadastro = () => {
           keyboardShouldPersistTaps="handled"
         >
           <Text style={styles.titulo}>Cadastro - Etapa {etapa}</Text>
-
           {etapa === 1 ? (
             <>
+            <View style={styles.cadastro}>
               {renderInput('Nome Completo', 'nome')}
               {renderInput('Sobrenome', 'sobrenome')}
               {renderInput('CPF', 'cpf', 'numeric')}
@@ -271,30 +271,33 @@ const Cadastro = () => {
               >
                 <Text style={styles.botaoTexto}>Próxima Etapa</Text>
               </Pressable>
+            </View>
             </>
           ) : (
             <>
-              {renderInput('CEP', 'cep', 'numeric')}
-              {renderInput('Endereço', 'endereco')}
-              {renderInput('Número', 'numero', 'numeric')}
-              {renderInput('Bairro', 'bairro')}
-              {renderInput('Cidade', 'cidade')}
-              {renderInput('Estado', 'estado')}
-              {renderInput('Mora Como', 'moraComo')}
+              <View style={styles.cadastro}>
+                {renderInput('CEP', 'cep', 'numeric')}
+                {renderInput('Endereço', 'endereco')}
+                {renderInput('Número', 'numero', 'numeric')}
+                {renderInput('Bairro', 'bairro')}
+                {renderInput('Cidade', 'cidade')}
+                {renderInput('Estado', 'estado')}
+                {renderInput('Mora Como', 'moraComo')}
 
-              <View style={styles.buttonGroup}>
-                <Pressable 
-                  style={styles.botao}
-                  onPress={() => setEtapa(1)}
-                >
-                  <Text style={styles.botaoTexto}>Etapa Anterior</Text>
-                </Pressable>
-                <Pressable 
-                  style={styles.botaoEnviar}
-                  onPress={handleCadastro}
-                >
-                  <Text style={styles.botaoTexto}>Finalizar Cadastro</Text>
-                </Pressable>
+                <View style={styles.buttonGroup}>
+                  <Pressable 
+                    style={styles.botao}
+                    onPress={() => setEtapa(1)}
+                  >
+                    <Text style={styles.botaoTexto}>Etapa Anterior</Text>
+                  </Pressable>
+                  <Pressable 
+                    style={styles.botaoEnviar}
+                    onPress={handleCadastro}
+                  >
+                    <Text style={styles.botaoTexto}>Finalizar Cadastro</Text>
+                  </Pressable>
+                </View>
               </View>
             </>
           )}
@@ -309,7 +312,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContainer: {
-    paddingBottom: 40
+    paddingBottom: 20
   },
   titulo: {
     color: '#FFF',
@@ -324,20 +327,22 @@ const styles = StyleSheet.create({
     textAlign: 'center'
   },
   label: {
-    color: '#FFF',
-    fontSize: 16,
+    textAlign: 'justify',
+    paddingBottom: 10,
     fontFamily: 'KronaOne-Regular',
-    marginBottom: 8
   },
   input: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    color: '#FFF',
+    textAlign: 'justify',
     fontSize: 16,
-    borderRadius: 50,
-    width: '100%',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
+    borderWidth: 1,
+    borderColor: 'gray',
+    borderRadius: 8,
+    marginBottom: 16,
+    paddingHorizontal: 8,
+    paddingTop: 14,
+    paddingBottom: 14,
+    fontFamily: 'KronaOne-Regular',
+    alignItems: 'center'
   },
   inputError: {
     borderColor: '#FF4444',
@@ -349,7 +354,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontFamily: 'KronaOne-Regular'
   },
-  linha: { height: 1, backgroundColor: '#FFF', marginTop: 5 },
   botao: {
     backgroundColor: '#4F29C4',
     padding: 15,
@@ -371,30 +375,12 @@ const styles = StyleSheet.create({
   },
   cadastro: {
     height: '100%',
+    backgroundColor: 'white',
     paddingTop: 30,
     paddingLeft: 14,
     paddingRight: 14,
-    backgroundColor: 'white',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
-  },
-  textForm: {
-    textAlign: 'justify',
-    paddingBottom: 10,
-    fontFamily: 'KronaOne-Regular',
-  },
-  TextInput: {
-    textAlign: 'justify',
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: 'gray',
-    borderRadius: 8,
-    marginBottom: 16,
-    paddingHorizontal: 8,
-    paddingTop: 14,
-    paddingBottom: 14,
-    fontFamily: 'KronaOne-Regular',
-    alignItems: 'center'
   },
   botaoDesabilitado: { 
     backgroundColor: '#666', 

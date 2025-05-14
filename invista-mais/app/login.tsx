@@ -121,11 +121,6 @@ export default function Login() {
           
           <View style={styles.form}>
             <TextInput
-              style={styles.input}
-              placeholder="Login"
-              placeholderTextColor="#d4d4d4"
-            />
-            <TextInput
               placeholderTextColor="#d4d4d4"
               
               style={[styles.input, emailError ? styles.inputError : null]}
