@@ -2,31 +2,36 @@ CREATE DATABASE IF NOT EXISTS sistema_auth;
 USE sistema_auth;
 
 CREATE TABLE usuarios (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    nome VARCHAR(100) NOT NULL,
-    sobrenome VARCHAR(100) NOT NULL,
-    cpf CHAR(11) UNIQUE NOT NULL,
-    telefone VARCHAR(15) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    senha VARCHAR(255) NOT NULL,
-    cep CHAR(8),
-    endereco VARCHAR(255),
-    numero VARCHAR(10),
-    bairro VARCHAR(100),
-    cidade VARCHAR(100),
-    estado CHAR(2),
-    mora_como VARCHAR(50),
-    verificado BOOLEAN DEFAULT FALSE,
-    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  nome VARCHAR(255) NOT NULL,
+  sobrenome VARCHAR(255) NOT NULL,
+  cpf VARCHAR(11) UNIQUE NOT NULL,
+  telefone VARCHAR(20) NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  senha VARCHAR(255) NOT NULL,
+  verificado BOOLEAN DEFAULT 0,
+  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE enderecos (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  usuario_id INT NOT NULL,
+  cep VARCHAR(8) NOT NULL,
+  endereco VARCHAR(255) NOT NULL,
+  numero VARCHAR(10) NOT NULL,
+  bairro VARCHAR(100) NOT NULL,
+  cidade VARCHAR(100) NOT NULL,
+  estado CHAR(2) NOT NULL,
+  mora_como VARCHAR(50),
+  FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
 CREATE TABLE codigos_verificacao (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    email VARCHAR(100) NOT NULL,
-    codigo CHAR(6) NOT NULL,
-    expira_em TIMESTAMP DEFAULT (CURRENT_TIMESTAMP + INTERVAL 10 MINUTE),
-    utilizado BOOLEAN DEFAULT FALSE,
-    FOREIGN KEY (email) REFERENCES usuarios(email) ON DELETE CASCADE
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(255) NOT NULL,
+  codigo VARCHAR(6) NOT NULL,
+  expira_em DATETIME NOT NULL,
+  utilizado BOOLEAN DEFAULT 0
 );
 CREATE TABLE CustoVidaClasseMedia (
     Ano INT NOT NULL,

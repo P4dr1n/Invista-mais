@@ -1,25 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, SafeAreaView, Alert } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { RootStackParamList } from '../types/types';
-import { useLocalSearchParams } from 'expo-router';
 
-type ValidarCodigoScreenProps = {
-  route: { params: { email: string } };
-};
-
-const ValidarCodigoScreen = ({ route }: ValidarCodigoScreenProps) => {
+const ValidarCodigoScreen = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
+  const route = useRoute();
   const [codigo, setCodigo] = useState('');
-    const email = Array.isArray(route.params.email) 
-    ? route.params.email[0] // Pega o primeiro elemento se for array
-    : route.params.email;
+  const [email, setEmail] = useState('');
+
+  // Carrega os parâmetros de navegação
+  useEffect(() => {
+    if (route.params) {
+      const params = route.params as { email: string | string[] };
+      const emailParam = Array.isArray(params.email) 
+        ? params.email[0] 
+        : params.email;
+      
+      if (emailParam) {
+        setEmail(emailParam);
+      } else {
+        Alert.alert('Erro', 'E-mail não encontrado');
+        navigation.goBack();
+      }
+    }
+  }, [route.params]);
 
   const handleValidar = async () => {
     try {
-      // Altere para seu IP real
+      if (!codigo || codigo.length !== 6) {
+        Alert.alert('Erro', 'Digite um código válido de 6 dígitos');
+        return;
+      }
+
       const response = await fetch('http://localhost:3000/verificacao/verificar-codigo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -28,8 +43,10 @@ const ValidarCodigoScreen = ({ route }: ValidarCodigoScreenProps) => {
 
       const data = await response.json();
       
-      if (!response.ok) throw new Error(data.mensagem || 'Erro na verificação');
-      
+      if (!response.ok) {
+        throw new Error(data.mensagem || 'Erro na verificação');
+      }
+
       if (data.success) {
         navigation.navigate('RedefinirSenha', { email });
       }
@@ -40,66 +57,90 @@ const ValidarCodigoScreen = ({ route }: ValidarCodigoScreenProps) => {
 
   const handleReenviar = async () => {
     try {
-      await fetch('http://localhost:3000/verificacao/solicitar-codigo', {
+      const response = await fetch('http://localhost:3000/verificacao/solicitar-codigo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email,codigo }),
       });
-      Alert.alert('Sucesso', 'Código reenviado!');
+
+      if (!response.ok) {
+        throw new Error('Falha ao reenviar código');
+      }
+
+      Alert.alert('Sucesso', 'Novo código enviado para seu e-mail!');
     } catch (error) {
       Alert.alert('Erro', 'Falha ao reenviar código');
     }
   };
-      
 
-      return (
-        <SafeAreaView style={styles.container}>
-          <LinearGradient
-            colors={['#3B0CC8', '#4F29C4', '#69ACBF', '#9E9783']}
-            style={styles.background}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <View style={styles.mainContainer}>
-              <Text style={styles.titulo}>VERIFICAÇÃO DE CÓDIGO</Text>
-              
-              <View style={styles.formContainer}>
-                <Text style={styles.instrucoes}>
-                  Enviamos um código de 6 dígitos para {email}
-                </Text>
-    
-                <TextInput
-                  style={styles.codigoInput}
-                  placeholder="••••••"
-                  placeholderTextColor="#999"
-                  keyboardType="number-pad"
-                  maxLength={6}
-                  value={codigo}
-                  onChangeText={setCodigo}
-                />
-    
-                <TouchableOpacity 
-                  style={styles.botao}
-                  onPress={handleValidar} // Nome corrigido
-                >
-                  <Text style={styles.botaoTexto}>VERIFICAR CÓDIGO</Text>
-                </TouchableOpacity>
-    
-                <TouchableOpacity
-                  style={styles.link}
-                  onPress={() => navigation.goBack()}
-                >
-                  <Text style={styles.linkTexto}>Reenviar código</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </LinearGradient>
-        </SafeAreaView>
-      );
-    }
+  if (!email) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <LinearGradient
+          colors={['#3B0CC8', '#4F29C4', '#69ACBF', '#9E9783']}
+          style={styles.background}
+        >
+          <View style={styles.errorContainer}>
+            <Text style={styles.errorText}>E-mail não encontrado</Text>
+            <TouchableOpacity
+              style={styles.botao}
+              onPress={() => navigation.goBack()}
+            >
+              <Text style={styles.botaoTexto}>Voltar</Text>
+            </TouchableOpacity>
+          </View>
+        </LinearGradient>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <LinearGradient
+        colors={['#3B0CC8', '#4F29C4', '#69ACBF', '#9E9783']}
+        style={styles.background}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      >
+        <View style={styles.mainContainer}>
+          <Text style={styles.titulo}>VERIFICAÇÃO DE CÓDIGO</Text>
+          
+          <View style={styles.formContainer}>
+            <Text style={styles.instrucoes}>
+              Enviamos um código de 6 dígitos para {email}
+            </Text>
+
+            <TextInput
+              style={styles.codigoInput}
+              placeholder="••••••"
+              placeholderTextColor="#999"
+              keyboardType="number-pad"
+              maxLength={6}
+              value={codigo}
+              onChangeText={setCodigo}
+            />
+
+            <TouchableOpacity 
+              style={styles.botao}
+              onPress={handleValidar}
+            >
+              <Text style={styles.botaoTexto}>VERIFICAR CÓDIGO</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.link}
+              onPress={handleReenviar}
+            >
+              <Text style={styles.linkTexto}>Reenviar código</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </LinearGradient>
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
-  // ... (estilos semelhantes com adaptações)
   container: {
     flex: 1,
   },
@@ -111,6 +152,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: 'rgba(0,0,0,0.5)',
     padding: 30,
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
   titulo: {
     fontSize: 28,
@@ -140,6 +187,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
+    marginVertical: 10,
   },
   botaoTexto: {
     color: '#FFF',
@@ -163,6 +211,12 @@ const styles = StyleSheet.create({
   linkTexto: {
     color: '#4F29C4',
     textDecorationLine: 'underline',
+  },
+  errorText: {
+    color: '#FF4444',
+    fontSize: 18,
+    marginBottom: 20,
+    textAlign: 'center',
   },
 });
 

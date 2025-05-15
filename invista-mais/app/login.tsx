@@ -57,7 +57,7 @@ export default function Login() {
         return;
       }
 
-      const response = await fetch('http://10.200.9.77:3000/auth/login', { // <- Adicionar /auth
+      const response = await fetch('http://localhost:3000/auth/login', { // <- Adicionar /auth
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, senha }),

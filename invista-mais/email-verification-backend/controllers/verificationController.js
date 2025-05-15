@@ -1,5 +1,7 @@
+// verificationController.js
 const sgMail = require('@sendgrid/mail');
 const pool = require('../config/db');
+require('dotenv').config();
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
@@ -36,39 +38,47 @@ exports.verificarCodigo = async (req, res) => {
   try {
     const { email, codigo } = req.body;
 
+    // Buscar código válido
     const [codigos] = await pool.query(
-      `SELECT * FROM codigos_verificacao 
-      WHERE email = ? 
-      AND codigo = ? 
-      AND expira_em > NOW() 
-      AND utilizado = 0`,
+      `SELECT id 
+       FROM codigos_verificacao 
+       WHERE email = ? 
+         AND codigo = ? 
+         AND expira_em > NOW() 
+         AND utilizado = 0
+       LIMIT 1`,
       [email, codigo]
     );
 
     if (codigos.length === 0) {
-      return res.status(400).json({ 
-        success: false, 
-        mensagem: 'Código inválido ou expirado' 
+      return res.status(400).json({
+        success: false,
+        mensagem: 'Código inválido ou expirado'
       });
     }
 
+    // Marcar código como utilizado
     await pool.query(
       'UPDATE codigos_verificacao SET utilizado = 1 WHERE id = ?',
       [codigos[0].id]
     );
 
+    // Atualizar usuário como verificado
     await pool.query(
       'UPDATE usuarios SET verificado = 1 WHERE email = ?',
       [email]
     );
 
-    res.json({ success: true });
+    res.json({
+      success: true,
+      mensagem: 'E-mail verificado com sucesso'
+    });
 
   } catch (error) {
     console.error('Erro na verificação:', error);
-    res.status(500).json({ 
-      success: false, 
-      mensagem: 'Erro na verificação' 
+    res.status(500).json({
+      success: false,
+      mensagem: 'Erro na verificação do código'
     });
   }
 };

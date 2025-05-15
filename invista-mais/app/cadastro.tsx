@@ -15,6 +15,13 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types/types';
 
+declare const process: {
+  env: {
+    INVERTEXTO_TOKEN: string;
+    API_BASE_URL: string;
+  };
+};
+
 type FormData = {
   senha: string;
   confirmarSenha: string;
@@ -50,18 +57,18 @@ const Campo = ({
   keyboardType = 'default',
   error
 }: CampoProps) => (
-    <View style={styles.campoContainer}>
-      <Text style={styles.label}>{label}</Text>
-      <TextInput
-        style={[styles.input, error ? styles.inputError : null]}
-        value={value}
-        onChangeText={onChangeText}
-        secureTextEntry={secureTextEntry}
-        keyboardType={keyboardType}
-        placeholderTextColor="#FFFFFF99"
-      />
-      {error && <Text style={styles.errorText}>{error}</Text>}
-    </View>
+  <View style={styles.campoContainer}>
+    <Text style={styles.label}>{label}</Text>
+    <TextInput
+      style={[styles.input, error ? styles.inputError : null]}
+      value={value}
+      onChangeText={onChangeText}
+      secureTextEntry={secureTextEntry}
+      keyboardType={keyboardType}
+      placeholderTextColor="#FFFFFF99"
+    />
+    {error && <Text style={styles.errorText}>{error}</Text>}
+  </View>
 );
 
 const Cadastro = () => {
@@ -113,25 +120,41 @@ const Cadastro = () => {
     }
   };
 
-  const validarCPF = async (cpf: string) => {
-    try {
+ const validarCPFRemoto = async (cpf: string) => {
+  try {
       const token = process.env.INVERTEXTO_TOKEN;
+      const cpfNumeros = cpf.replace(/\D/g, '');
+
+      // Validação básica antes da requisição
+      if (cpfNumeros.length !== 11) {
+        throw new Error('CPF deve conter 11 dígitos');
+      }
+
       const response = await fetch(
-        `https://api.invertexto.com/v1/validator?token=${token}&value=${cpf}&type=cpf`
+        `https://api.invertexto.com/v1/validator?token=19660|FBOWgFM5cKzaszEL98oQTRhDiN0OaU0g&value=${cpfNumeros}&type=cpf`
       );
+
+      console.log('Status da resposta:', response.status);
       
+      if (response.status === 401) {
+        throw new Error('Token de API inválido ou expirado');
+      }
+
+      if (!response.ok) {
+        throw new Error(`Erro na API: ${response.status}`);
+      }
+
       const data = await response.json();
       
-      if (!response.ok) {
-        throw new Error(data.message || 'Erro na validação');
+      if (typeof data.valid !== 'boolean') {
+        throw new Error('Resposta da API inválida');
       }
 
       return data.valid;
 
-    } catch (error: any) {
-      console.error('Erro na validação do CPF:', error);
-      Alert.alert('Erro', 'Não foi possível validar o CPF');
-      return false;
+    } catch (error) {
+      console.error('Erro na validação:', error);
+      throw error;
     }
   };
 
@@ -145,20 +168,32 @@ const Cadastro = () => {
     }
 
     if (campo === 'cpf') {
-      valor = valor.replace(/\D/g, '').substring(0, 11);
-      
-      setFormData(prev => ({ 
-        ...prev, 
-        [campo]: valor,
-        cpfError: '' 
+      const cpfLimpo = valor.replace(/\D/g, '');
+      let cpfFormatado = cpfLimpo
+        .replace(/(\d{3})(\d)/, '$1.$2')
+        .replace(/(\d{3})\.(\d{3})(\d)/, '$1.$2.$3')
+        .replace(/(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4')
+        .replace(/(-\d{2})\d+?$/, '$1');
+
+      setFormData(prev => ({
+        ...prev,
+        [campo]: cpfFormatado,
+        cpfError: ''
       }));
 
-      if (valor.length === 11) {
-        const valido = await validarCPF(valor);
-        if (!valido) {
+      if (cpfLimpo.length === 11) {
+        try {
+          const validoRemoto = await validarCPFRemoto(cpfLimpo);
+          if (!validoRemoto) {
+            setFormData(prev => ({
+              ...prev,
+              cpfError: 'CPF não consta na base oficial'
+            }));
+          }
+        } catch (error: any) {
           setFormData(prev => ({
             ...prev,
-            cpfError: 'CPF inválido'
+            cpfError: error.message || 'Falha na verificação do CPF'
           }));
         }
       }
@@ -171,7 +206,7 @@ const Cadastro = () => {
     return (
       formData.nome.length > 2 &&
       formData.sobrenome.length > 2 &&
-      formData.cpf.length === 11 &&
+      formData.cpf.replace(/\D/g, '').length === 11 &&
       !formData.cpfError &&
       formData.telefone.length >= 10 &&
       formData.login.includes('@') &&
@@ -182,6 +217,18 @@ const Cadastro = () => {
 
   const handleCadastro = async () => {
     try {
+      if (
+        !formData.cep ||
+        !formData.endereco ||
+        !formData.numero ||
+        !formData.bairro ||
+        !formData.cidade ||
+        !formData.estado
+      ) {
+        Alert.alert('Erro', 'Preencha todos os campos de endereço');
+        return;
+      }
+
       if (formData.cpfError) {
         Alert.alert('Erro', 'CPF inválido');
         return;
@@ -190,11 +237,11 @@ const Cadastro = () => {
       const dadosParaEnvio = {
         nome: formData.nome,
         sobrenome: formData.sobrenome,
-        cpf: formData.cpf,
-        telefone: formData.telefone,
+        cpf: formData.cpf.replace(/\D/g, ''),
+        telefone: formData.telefone.replace(/\D/g, ''),
         email: formData.login,
         senha: formData.senha,
-        cep: formData.cep,
+        cep: formData.cep.replace(/\D/g, ''),
         endereco: formData.endereco,
         numero: formData.numero,
         bairro: formData.bairro,
@@ -203,7 +250,9 @@ const Cadastro = () => {
         mora_como: formData.moraComo
       };
 
-      const response = await fetch('http://localhost:3000/auth/cadastro', {
+      console.log('Dados enviados:', dadosParaEnvio);
+
+      const response = await fetch(`http://localhost:3000/auth/cadastro`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dadosParaEnvio),
@@ -224,21 +273,21 @@ const Cadastro = () => {
     }
   };
 
- const renderInput = (
-  label: string,
-  campo: keyof Omit<FormData, 'cpfError'>, // Exclua cpfError dos campos
-  keyboardType: 'default' | 'numeric' | 'email-address' | 'phone-pad' = 'default',
-  secure = false
-) => (
-  <Campo
-    label={label}
-    value={formData[campo] as string} // Type assertion
-    onChangeText={(text) => handleChange(campo, text)}
-    keyboardType={keyboardType}
-    secureTextEntry={secure}
-    error={campo === 'cpf' ? formData.cpfError : undefined}
-  />
-);
+  const renderInput = (
+    label: string,
+    campo: keyof Omit<FormData, 'cpfError'>,
+    keyboardType: 'default' | 'numeric' | 'email-address' | 'phone-pad' = 'default',
+    secure = false
+  ) => (
+    <Campo
+      label={label}
+      value={formData[campo] as string}
+      onChangeText={(text) => handleChange(campo, text)}
+      keyboardType={keyboardType}
+      secureTextEntry={secure}
+      error={campo === 'cpf' ? formData.cpfError : undefined}
+    />
+  );
 
   return (
     <LinearGradient
@@ -255,23 +304,23 @@ const Cadastro = () => {
           <Text style={styles.titulo}>Cadastro - Etapa {etapa}</Text>
           {etapa === 1 ? (
             <>
-            <View style={styles.cadastro}>
-              {renderInput('Nome Completo', 'nome')}
-              {renderInput('Sobrenome', 'sobrenome')}
-              {renderInput('CPF', 'cpf', 'numeric')}
-              {renderInput('Telefone', 'telefone', 'phone-pad')}
-              {renderInput('E-mail', 'login', 'email-address')}
-              {renderInput('Senha', 'senha', 'default', true)}
-              {renderInput('Confirmar Senha', 'confirmarSenha', 'default', true)}
+              <View style={styles.cadastro}>
+                {renderInput('Nome Completo', 'nome')}
+                {renderInput('Sobrenome', 'sobrenome')}
+                {renderInput('CPF', 'cpf', 'numeric')}
+                {renderInput('Telefone', 'telefone', 'phone-pad')}
+                {renderInput('E-mail', 'login', 'email-address')}
+                {renderInput('Senha', 'senha', 'default', true)}
+                {renderInput('Confirmar Senha', 'confirmarSenha', 'default', true)}
 
-              <Pressable
-                style={[styles.botao, !validarEtapa1() && styles.botaoDesabilitado]}
-                onPress={() => setEtapa(2)}
-                disabled={!validarEtapa1()}
-              >
-                <Text style={styles.botaoTexto}>Próxima Etapa</Text>
-              </Pressable>
-            </View>
+                <Pressable
+                  style={[styles.botao, !validarEtapa1() && styles.botaoDesabilitado]}
+                  onPress={() => setEtapa(2)}
+                  disabled={!validarEtapa1()}
+                >
+                  <Text style={styles.botaoTexto}>Próxima Etapa</Text>
+                </Pressable>
+              </View>
             </>
           ) : (
             <>
