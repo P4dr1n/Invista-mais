@@ -5,12 +5,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation, ParamListBase } from "@react-navigation/native";
 
 // Importe suas imagens corretamente (exemplo com require)
-const images = {
-  profile: require("./assets/WhatsApp Image 2025-02-19 at 19.27.06.png"),
-  settings: require("./assets/settings.svg"),
-  ellipse: require("./assets/Ellipse 3.png"),
-  logout: require("./assets/log-out.svg"),
-};
 
 // Componente temporário para seta (substitua pelo seu componente real)
 const Arrowdowncircle = ({ width, height }: { width: number; height: number }) => (
@@ -27,7 +21,7 @@ const PERFIL = () => {
           <Image 
             style={styles.profileImage} 
             resizeMode="cover" 
-            source={images.profile} 
+            
           />
         </Pressable>
         
@@ -37,14 +31,14 @@ const PERFIL = () => {
           <Image 
             style={styles.icon} 
             resizeMode="cover" 
-            source={images.settings} 
+            
           />
         </Pressable>
         
         <Image 
           style={styles.ellipse} 
           resizeMode="cover" 
-          source={images.ellipse} 
+         
         />
       </View>
 
@@ -74,7 +68,7 @@ const PERFIL = () => {
         <Image 
           style={styles.icon} 
           resizeMode="cover" 
-          source={images.logout} 
+          
         />
       </Pressable>
     </SafeAreaView>

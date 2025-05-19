@@ -114,6 +114,103 @@ exports.cadastro = async (req, res) => {
     connection.release();
   }
 };
+exports.criarPerfilInvestimento = async (req, res) => {
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    const { usuarioId, idade, rendaAnual, objetivo, horizonte, toleranciaRisco, conhecimento, liquidez, patrimonio } = req.body;
+
+    // Validação básica
+    if (!usuarioId || !idade || !rendaAnual || !objetivo || !horizonte || !toleranciaRisco || !conhecimento || !liquidez) {
+      return res.status(400).json({
+        success: false,
+        mensagem: 'Campos obrigatórios faltando'
+      });
+    }
+
+    // Verificar existência do usuário
+    const [usuario] = await connection.query(
+      'SELECT id FROM usuarios WHERE id = ?',
+      [usuarioId]
+    );
+
+    if (usuario.length === 0) {
+      return res.status(404).json({
+        success: false,
+        mensagem: 'Usuário não encontrado'
+      });
+    }
+
+    // Inserir/Atualizar perfil
+    const [result] = await connection.query(
+      `INSERT INTO PerfilInvestimento (
+        UsuarioID, Idade, RendaAnual, Objetivo, Horizonte,
+        ToleranciaRisco, ConhecimentoInvestimentos, LiquidezNecessaria, ValorPatrimonio
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ON DUPLICATE KEY UPDATE
+        Idade = VALUES(Idade),
+        RendaAnual = VALUES(RendaAnual),
+        Objetivo = VALUES(Objetivo),
+        Horizonte = VALUES(Horizonte),
+        ToleranciaRisco = VALUES(ToleranciaRisco),
+        ConhecimentoInvestimentos = VALUES(ConhecimentoInvestimentos),
+        LiquidezNecessaria = VALUES(LiquidezNecessaria),
+        ValorPatrimonio = VALUES(ValorPatrimonio)`,
+      [usuarioId, idade, rendaAnual, objetivo, horizonte, toleranciaRisco, conhecimento, liquidez, patrimonio]
+    );
+
+    await connection.commit();
+
+    res.status(201).json({
+      success: true,
+      mensagem: 'Perfil de investimento salvo com sucesso',
+      perfilId: result.insertId
+    });
+
+  } catch (error) {
+    await connection.rollback();
+    console.error('Erro ao salvar perfil:', error);
+    res.status(500).json({
+      success: false,
+      mensagem: 'Erro ao salvar perfil de investimento'
+    });
+  } finally {
+    connection.release();
+  }
+};
+exports.cadastrarCustoVida = async (req, res) => {
+  try {
+    const { Ano, Regiao, SalarioMedio, Habitacao, Alimentacao, Transporte, EducacaoSaude, Lazer, Dividas, PercentualMoradia, Fonte } = req.body;
+
+    await pool.query(
+      `INSERT INTO CustoVidaClasseMedia (
+        Ano, Regiao, SalarioMedio, Habitacao, Alimentacao, Transporte, 
+        EducacaoSaude, Lazer, Dividas, PercentualMoradia, Fonte
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [Ano, Regiao, SalarioMedio, Habitacao, Alimentacao, Transporte, 
+       EducacaoSaude, Lazer, Dividas, PercentualMoradia, Fonte]
+    );
+
+    res.status(201).json({
+      success: true,
+      mensagem: 'Dados de custo de vida cadastrados com sucesso'
+    });
+
+  } catch (error) {
+    console.error('Erro ao cadastrar custo de vida:', error);
+    res.status(500).json({
+      success: false,
+      mensagem: 'Erro ao registrar dados de custo de vida'
+    });
+  }
+};
+
+// Rota correspondente
+router.post('/custo-vida', authController.cadastrarCustoVida);
+
+// Adicione esta rota no seu arquivo de rotas (investmentRoutes.js)
+router.post('/perfil-investimento', authMiddleware, authController.criarPerfilInvestimento);
 
 exports.login = async (req, res) => {
   try {

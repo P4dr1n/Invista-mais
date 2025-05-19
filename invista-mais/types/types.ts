@@ -3,7 +3,7 @@ export type RootStackParamList = {
     index: undefined;
     login: undefined;
     cadastro: undefined;
-    Configuracoes: undefined;
+    configuracoes: undefined;
     perfil:undefined;
     editarPerfil:undefined;
     Home: undefined;
@@ -11,4 +11,6 @@ export type RootStackParamList = {
     ValidarEmail: { email: string };
     ValidarCodigo: { email: string };
     RedefinirSenha: { email: string };
+    FormFinancias:undefined;
+    ResultadoPerfil: { perfil: string };
   };
