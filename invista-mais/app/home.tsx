@@ -2,6 +2,7 @@ import * as React from "react";
 import { ScrollView, Text, StyleSheet, View } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
 import GoogleChart from './GoogleChart';
+import MenuLateral from '../components/MenuLateral';
 
 const HOME = () => {
   const chartData = [
@@ -11,6 +12,7 @@ const HOME = () => {
     ['Mar', 1500, 1200, 10000],
     ['Abr', 1200, 1500, 10000]
   ];
+  
 
   return (
     <LinearGradient 

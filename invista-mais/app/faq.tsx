@@ -18,7 +18,7 @@ const AjudaFaq = () => {
         <Image
           style={styles.profileImage}
           resizeMode="contain"
-          source={require("../assets/WhatsApp Image 2025-02-19 at 19.27.06.png")}
+          
         />
         <Text style={styles.title}>AJUDA / FAQ</Text>
       </View>
@@ -57,7 +57,7 @@ const AjudaFaq = () => {
         <Image
           style={styles.backIcon}
           resizeMode="contain"
-          source={require("../assets/log-out.svg")}
+         
         />
       </Pressable>
     </SafeAreaView>

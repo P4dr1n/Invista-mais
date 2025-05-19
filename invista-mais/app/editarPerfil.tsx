@@ -38,11 +38,7 @@ const Edit2: React.FC<SVGProps> = ({ width, height, style }) => (
 );
 
 // Importe suas imagens
-const images = {
-  profile: require("../assets/WhatsApp Image 2025-02-19 at 19.27.06.png"),
-  settings: require("../assets/settings.svg"),
-  logout: require("../assets/log-out.svg"),
-};
+
 
 const EDITARPERFIL = () => {
   const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
@@ -61,7 +57,7 @@ const EDITARPERFIL = () => {
           <Image
             style={styles.profileImage}
             resizeMode="cover"
-            source={images.profile}
+            
           />
           
           <Text style={styles.title}>EDITAR PERFIL</Text>
@@ -70,7 +66,7 @@ const EDITARPERFIL = () => {
             <Image
               style={styles.icon}
               resizeMode="cover"
-              source={images.settings}
+              
             />
           </Pressable>
         </View>
@@ -109,7 +105,7 @@ const EDITARPERFIL = () => {
           <Image
             style={styles.logoutIcon}
             resizeMode="cover"
-            source={images.logout}
+            
           />
         </Pressable>
       </LinearGradient>

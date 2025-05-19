@@ -20,7 +20,7 @@ const Configuracoes = () => {
         <Image
           style={styles.profileImage}
           resizeMode="cover"
-          source={require("../assets/WhatsApp Image 2025-02-19 at 19.27.06.png")}
+          
         />
         <Text style={styles.title}>CONFIGURAÇÕES</Text>
       </View>
@@ -39,7 +39,7 @@ const Configuracoes = () => {
 
         <Pressable 
           style={styles.option} 
-          onPress={() => navigation.navigate('Login')}
+          onPress={() => navigation.navigate('login')}
         >
           <Text style={styles.optionText}>SAIR DO USUÁRIO</Text>
           <Group51 />
@@ -59,7 +59,7 @@ const Configuracoes = () => {
         <Image
           style={styles.logoutIcon}
           resizeMode="contain"
-          source={require("../assets/log-out.svg")}
+          
         />
       </Pressable>
     </SafeAreaView>
