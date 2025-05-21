@@ -206,11 +206,7 @@ exports.cadastrarCustoVida = async (req, res) => {
   }
 };
 
-// Rota correspondente
-router.post('/custo-vida', authController.cadastrarCustoVida);
-
-// Adicione esta rota no seu arquivo de rotas (investmentRoutes.js)
-router.post('/perfil-investimento', authMiddleware, authController.criarPerfilInvestimento);
+// Rota correspondent
 
 exports.login = async (req, res) => {
   try {
