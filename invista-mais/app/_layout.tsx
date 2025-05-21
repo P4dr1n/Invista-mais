@@ -17,6 +17,7 @@ export default function RootLayout() {
       <Stack.Screen name="ValidarEmail" options={{ title: 'VERIFICAÇÃO' }} />
       <Stack.Screen name="ValidarCodigo" options={{ title: 'CÓDIGO' }} />
       <Stack.Screen name="RedefinirSenha" options={{ title: 'REDEFINIR SENHA' }} />
+      
     </Stack>
   );
 }

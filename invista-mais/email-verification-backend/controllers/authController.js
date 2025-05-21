@@ -179,30 +179,101 @@ exports.criarPerfilInvestimento = async (req, res) => {
     connection.release();
   }
 };
-exports.cadastrarCustoVida = async (req, res) => {
+// authController.js
+exports.authMiddleware = (req, res, next) => {
   try {
-    const { Ano, Regiao, SalarioMedio, Habitacao, Alimentacao, Transporte, EducacaoSaude, Lazer, Dividas, PercentualMoradia, Fonte } = req.body;
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      return res.status(401).json({ success: false, mensagem: 'Token não fornecido' });
+    }
 
-    await pool.query(
+    const token = authHeader.split(' ')[1];
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = { id: decoded.id };
+    next();
+  } catch (error) {
+    return res.status(401).json({
+      success: false,
+      mensagem: 'Autenticação falhou',
+      detalhes: process.env.NODE_ENV === 'development' ? error.message : null
+    });
+  }
+};
+
+
+// Cadastro de Custo de Vida
+exports.cadastrarCustoVida = async (req, res) => {
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    const usuarioId = req.user.id;
+    const { 
+      Ano, 
+      Regiao, 
+      SalarioMedio, 
+      Habitacao = null, 
+      Alimentacao = null, 
+      Transporte = null,
+      EducacaoSaude = null, 
+      Lazer = null, 
+      Dividas = null, 
+      PercentualMoradia = null, 
+      Fonte = null 
+    } = req.body;
+
+    // Validação
+    if (!Ano || !Regiao || !SalarioMedio) {
+      return res.status(400).json({
+        success: false,
+        mensagem: 'Ano, Região e Salário são obrigatórios'
+      });
+    }
+
+    // Inserção
+    const [result] = await connection.query(
       `INSERT INTO CustoVidaClasseMedia (
-        Ano, Regiao, SalarioMedio, Habitacao, Alimentacao, Transporte, 
-        EducacaoSaude, Lazer, Dividas, PercentualMoradia, Fonte
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [Ano, Regiao, SalarioMedio, Habitacao, Alimentacao, Transporte, 
-       EducacaoSaude, Lazer, Dividas, PercentualMoradia, Fonte]
+        UsuarioID, Ano, Regiao, SalarioMedio,
+        Habitacao, Alimentacao, Transporte,
+        EducacaoSaude, Lazer, Dividas,
+        PercentualMoradia, Fonte
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        usuarioId,
+        Ano,
+        Regiao,
+        SalarioMedio,
+        Habitacao,
+        Alimentacao,
+        Transporte,
+        EducacaoSaude,
+        Lazer,
+        Dividas,
+        PercentualMoradia,
+        Fonte
+      ]
     );
 
-    res.status(201).json({
+    await connection.commit();
+    res.status(201).json({ 
       success: true,
-      mensagem: 'Dados de custo de vida cadastrados com sucesso'
+      mensagem: 'Dados salvos com sucesso',
+      id: result.insertId
     });
 
   } catch (error) {
-    console.error('Erro ao cadastrar custo de vida:', error);
+    await connection.rollback();
+    console.error('Erro no cadastro:', {
+      code: error.code,
+      sqlMessage: error.sqlMessage,
+      stack: error.stack
+    });
     res.status(500).json({
       success: false,
-      mensagem: 'Erro ao registrar dados de custo de vida'
+      mensagem: 'Erro interno no servidor'
     });
+  } finally {
+    connection.release();
   }
 };
 

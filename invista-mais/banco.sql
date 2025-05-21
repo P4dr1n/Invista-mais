@@ -44,17 +44,15 @@ CREATE TABLE codigos_verificacao (
 
 -- Tabela de Custo de Vida com estrutura normalizada
 CREATE TABLE CustoVidaClasseMedia (
-    id INT AUTO_INCREMENT PRIMARY KEY,  -- Chave primária única
-    Ano INT NOT NULL,
-    Regiao VARCHAR(50) NOT NULL,
-    SalarioMedio DECIMAL(10,2) NOT NULL,
-    Habitacao DECIMAL(5,2),       -- Percentual ajustado
-    Alimentacao DECIMAL(5,2),     -- Percentual ajustado
-    Transporte DECIMAL(5,2),      -- Percentual ajustado
-    EducacaoSaude DECIMAL(5,2),   -- Percentual ajustado
-    Lazer DECIMAL(5,2),           -- Percentual ajustado
-    Dividas DECIMAL(5,2),         -- Percentual ajustado
-    Fonte VARCHAR(100),
-    UNIQUE KEY unq_ano_regiao (Ano, Regiao),  -- Garante combinação única
-    INDEX idx_regiao (Regiao)      -- Índice para buscas por região
+  Ano INT NOT NULL,
+  Regiao VARCHAR(50) NOT NULL,
+  SalarioMedio DECIMAL(15,2) NOT NULL,      
+  Habitacao DECIMAL(7,2),                  
+  Alimentacao DECIMAL(7,2),
+  Transporte DECIMAL(7,2),
+  EducacaoSaude DECIMAL(7,2),
+  Lazer DECIMAL(7,2),
+  Dividas DECIMAL(7,2),
+  PercentualMoradia DECIMAL(7,2),          
+  Fonte VARCHAR(255)
 );

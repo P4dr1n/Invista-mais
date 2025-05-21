@@ -19,7 +19,13 @@ app.use('/verificacao', verificationRoutes);
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK' });
 });
-
+app.use((err, req, res, next) => {
+  console.error('Erro global:', err);
+  res.status(500).json({
+    success: false,
+    mensagem: 'Erro interno do servidor'
+  });
+});
 // Iniciar servidor
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
