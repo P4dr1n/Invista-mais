@@ -9,5 +9,13 @@ const pool = mysql.createPool({
   connectionLimit: 10,
   queueLimit: 0
 });
-
+pool.getConnection()
+  .then(conn => {
+    console.log('Conectado ao MySQL!');
+    conn.release();
+  })
+  .catch(err => {
+    console.error('Erro de conexão com MySQL:', err);
+    process.exit(1); // Encerra o processo se não conectar
+  });
 module.exports = pool;

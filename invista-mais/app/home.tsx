@@ -1,10 +1,13 @@
 import * as React from "react";
 import { ScrollView, Text, StyleSheet, View } from "react-native";
 import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import GoogleChart from './GoogleChart';
-import MenuLateral from '../components/MenuLateral';
+import SidebarNavigation, { MenuToggleButton } from '../components/VerticalMenuNavigation';
 
 const HOME = () => {
+  const [isSidebarVisible, setIsSidebarVisible] = React.useState(false);
+
   const chartData = [
     ['Mês', 'Dívida', 'Saldo', 'Meta'],
     ['Jan', 2000, 500, 10000],
@@ -12,72 +15,96 @@ const HOME = () => {
     ['Mar', 1500, 1200, 10000],
     ['Abr', 1200, 1500, 10000]
   ];
-  
+
+  const toggleSidebar = () => {
+    setIsSidebarVisible(!isSidebarVisible);
+  };
 
   return (
-    <LinearGradient 
-       style={styles.container}
+    <SafeAreaView style={styles.container}>
+      <LinearGradient 
+        style={styles.gradient}
         colors={['#5028c6', '#603ec5', '#b3b0bc']}
         locations={[0, 0.5, 1] as [number, number, number]}
-        start={{ x: 0.5, y: 0 }}   // Topo
+        start={{ x: 0.5, y: 0 }}
         end={{ x: 0.5, y: 1 }}  
-    >
-      <ScrollView 
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
       >
+        {/* Header com botão do menu */}
         <View style={styles.header}>
+          <MenuToggleButton onPress={toggleSidebar} />
           <Text style={styles.headerTitle}>Resumo Financeiro</Text>
+          <View style={styles.headerSpacer} />
         </View>
 
-        <View style={styles.cardContainer}>
-          <View style={[styles.card, styles.debtCard]}>
-            <Text style={styles.cardTitle}>Dívida Atual</Text>
-            <Text style={styles.cardValue}>R$ 1.200,00</Text>
+        <ScrollView 
+          contentContainerStyle={styles.contentContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.cardContainer}>
+            <View style={[styles.card, styles.debtCard]}>
+              <Text style={styles.cardTitle}>Dívida Atual</Text>
+              <Text style={styles.cardValue}>R$ 1.200,00</Text>
+            </View>
+
+            <View style={[styles.card, styles.balanceCard]}>
+              <Text style={styles.cardTitle}>Saldo Atual</Text>
+              <Text style={styles.cardValue}>R$ 1.500,00</Text>
+            </View>
+
+            <View style={[styles.card, styles.goalCard]}>
+              <Text style={styles.cardTitle}>Meta Mensal</Text>
+              <Text style={styles.cardValue}>R$ 10.000,00</Text>
+            </View>
           </View>
 
-          <View style={[styles.card, styles.balanceCard]}>
-            <Text style={styles.cardTitle}>Saldo Atual</Text>
-            <Text style={styles.cardValue}>R$ 1.500,00</Text>
+          <View style={styles.chartContainer}>
+            <Text style={styles.chartTitle}>Evolução Financeira</Text>
+            <GoogleChart 
+                data={chartData}
+                title="Evolução Financeira"
+                chartType="LineChart"
+            />
           </View>
+        </ScrollView>
 
-          <View style={[styles.card, styles.goalCard]}>
-            <Text style={styles.cardTitle}>Meta Mensal</Text>
-            <Text style={styles.cardValue}>R$ 10.000,00</Text>
-          </View>
-        </View>
-
-        <View style={styles.chartContainer}>
-          <Text style={styles.chartTitle}>Evolução Financeira</Text>
-          <GoogleChart 
-              data={chartData}
-              title="Evolução Financeira"
-              chartType="LineChart" // Forçar tipo explícito
-          />
-        </View>
-
-      </ScrollView>
-    </LinearGradient>
+        {/* Menu Lateral */}
+        <SidebarNavigation
+          currentPage="home"
+          isVisible={isSidebarVisible}
+          onToggle={toggleSidebar}
+        />
+      </LinearGradient>
+    </SafeAreaView>
   );
 };
 
-// Mantenha os mesmos estilos do arquivo anterior
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  contentContainer: {
-    padding: 20,
-    paddingBottom: 40,
+  gradient: {
+    flex: 1,
   },
   header: {
-    marginBottom: 30,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   headerTitle: {
     color: '#FFF',
-    fontSize: 24,
+    fontSize: 20,
     fontFamily: 'KronaOne-Regular',
+    textAlign: 'center',
+  },
+  headerSpacer: {
+    width: 40, // Mesmo tamanho do botão para centralizar o título
+  },
+  contentContainer: {
+    padding: 20,
+    paddingBottom: 40,
   },
   cardContainer: {
     gap: 15,
@@ -115,6 +142,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     borderRadius: 12,
     padding: 15,
+    marginBottom: 30,
   },
   chartTitle: {
     color: '#FFF',

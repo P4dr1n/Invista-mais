@@ -3,6 +3,7 @@ import { Image, StyleSheet, Pressable, Text, View, SafeAreaView } from "react-na
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from '../types/types';
+import SidebarNavigation, { MenuToggleButton } from '../components/VerticalMenuNavigation';
 
 // Componentes SVG temporários - substitua pelos reais
 const Group49 = () => <View style={styles.separator} />;
@@ -10,7 +11,10 @@ const Group50 = () => <View style={styles.separator} />;
 
 const AjudaFaq = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-
+   const [isSidebarVisible, setIsSidebarVisible] = React.useState(false);
+    const toggleSidebar = () => {
+      setIsSidebarVisible(!isSidebarVisible);
+    };
   return (
     <SafeAreaView style={styles.container}>
       {/* Cabeçalho */}
@@ -19,6 +23,16 @@ const AjudaFaq = () => {
           style={styles.profileImage}
           resizeMode="contain"
           
+        />
+        <View style={styles.header}>
+                  <MenuToggleButton onPress={toggleSidebar} />
+                  <Text style={styles.headerTitle}></Text>
+                  <View style={styles.headerSpacer} />
+                </View>
+                <SidebarNavigation
+          currentPage="faq"
+          isVisible={isSidebarVisible}
+          onToggle={toggleSidebar}
         />
         <Text style={styles.title}>AJUDA / FAQ</Text>
       </View>
@@ -60,6 +74,12 @@ const AjudaFaq = () => {
          
         />
       </Pressable>
+       {/* Menu Lateral */}
+       <SidebarNavigation
+          currentPage="faq"
+          isVisible={isSidebarVisible}
+          onToggle={toggleSidebar}
+        />
     </SafeAreaView>
   );
 };
@@ -74,6 +94,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 30,
+  },
+  headerTitle: {
+    color: '#FFF',
+    fontSize: 20,
+    fontFamily: 'KronaOne-Regular',
+    textAlign: 'center',
+  },
+  headerSpacer: {
+    width: 40, // Mesmo tamanho do botão para centralizar o título
   },
   profileImage: {
     width: 60,

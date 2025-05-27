@@ -2,7 +2,9 @@ import * as React from "react";
 import { Image, StyleSheet, Pressable, Text, View, SafeAreaView } from "react-native";
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from "@react-navigation/native";
+import FloatingNavigation from '../components/FloatingNavigation';
 import { RootStackParamList } from '../types/types';
+import SidebarNavigation, { MenuToggleButton } from '../components/VerticalMenuNavigation';
 
 // Importe os SVGs corretamente (exemplo genérico)
 const Group49 = () => <View style={styles.svgLine} />;
@@ -12,10 +14,23 @@ const Group511 = () => <View style={styles.svgLine} />;
 
 const Configuracoes = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-
+  const [isSidebarVisible, setIsSidebarVisible] = React.useState(false);
+      const toggleSidebar = () => {
+        setIsSidebarVisible(!isSidebarVisible);
+      };
   return (
     <SafeAreaView style={styles.container}>
       {/* Cabeçalho */}
+      <View style={styles.header}>
+                  <MenuToggleButton onPress={toggleSidebar} />
+                  <Text style={styles.headerTitle}></Text>
+                  <View style={styles.headerSpacer} />
+                </View>
+                <SidebarNavigation
+          currentPage="configuracoes"
+          isVisible={isSidebarVisible}
+          onToggle={toggleSidebar}
+        />
       <View style={styles.header}>
         <Image
           style={styles.profileImage}
@@ -62,6 +77,12 @@ const Configuracoes = () => {
           
         />
       </Pressable>
+      {/* Menu Lateral */}
+      <SidebarNavigation
+          currentPage="configuracoes"
+          isVisible={isSidebarVisible}
+          onToggle={toggleSidebar}
+        />
     </SafeAreaView>
   );
 };
@@ -76,6 +97,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 40,
+  },
+  headerTitle: {
+    color: '#FFF',
+    fontSize: 20,
+    fontFamily: 'KronaOne-Regular',
+    textAlign: 'center',
+  },
+  headerSpacer: {
+    width: 40, // Mesmo tamanho do botão para centralizar o título
   },
   profileImage: {
     width: 82,

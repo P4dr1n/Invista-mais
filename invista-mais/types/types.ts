@@ -13,4 +13,5 @@ export type RootStackParamList = {
     RedefinirSenha: { email: string };
     FormFinancias:undefined;
     ResultadoPerfil: { perfil: string };
+    planos:undefined;
   };

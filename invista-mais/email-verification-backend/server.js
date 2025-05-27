@@ -1,4 +1,4 @@
-require('dotenv').config({ path: './.env' });
+require('dotenv').config({ path: '../email-verification-backend/.env' });
 const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');

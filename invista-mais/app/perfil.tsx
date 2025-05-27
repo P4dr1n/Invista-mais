@@ -3,6 +3,7 @@ import { Image, StyleSheet, Pressable, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation, ParamListBase } from "@react-navigation/native";
+import SidebarNavigation, { MenuToggleButton } from '../components/VerticalMenuNavigation';
 
 // Importe suas imagens corretamente (exemplo com require)
 
@@ -13,9 +14,24 @@ const Arrowdowncircle = ({ width, height }: { width: number; height: number }) =
 
 const PERFIL = () => {
   const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
+  const [isSidebarVisible, setIsSidebarVisible] = React.useState(false);
+  const toggleSidebar = () => {
+    setIsSidebarVisible(!isSidebarVisible);
+  };
 
   return (
+    
     <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+                  <MenuToggleButton onPress={toggleSidebar} />
+                  <Text style={styles.headerTitle}>Resumo Financeiro</Text>
+                  <View style={styles.headerSpacer} />
+                </View>
+                <SidebarNavigation
+          currentPage="perfil"
+          isVisible={isSidebarVisible}
+          onToggle={toggleSidebar}
+        />
       <View style={styles.headerContainer}>
         <Pressable style={styles.profileImageWrapper}>
           <Image 
@@ -60,17 +76,26 @@ const PERFIL = () => {
 
         <Text style={styles.profileType}>CUIDADOSO</Text>
       </View>
-
+      
+      
       <Pressable 
         style={styles.logoutButton} 
         onPress={() => navigation.goBack()}
+        
       >
         <Image 
           style={styles.icon} 
           resizeMode="cover" 
           
         />
+        
       </Pressable>
+       {/* Menu Lateral */}
+       <SidebarNavigation
+          currentPage="perfil"
+          isVisible={isSidebarVisible}
+          onToggle={toggleSidebar}
+        />
     </SafeAreaView>
   );
 };
@@ -85,6 +110,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 20,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 15,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  headerTitle: {
+    color: '#FFF',
+    fontSize: 20,
+    fontFamily: 'KronaOne-Regular',
+    textAlign: 'center',
+  },
+  headerSpacer: {
+    width: 40, // Mesmo tamanho do botão para centralizar o título
   },
   profileImageWrapper: {
     width: 82,
