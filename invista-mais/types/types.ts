@@ -14,4 +14,6 @@ export type RootStackParamList = {
     FormFinancias:undefined;
     ResultadoPerfil: { perfil: string };
     planos:undefined;
+    faq:undefined;
+    gastos:undefined;
   };

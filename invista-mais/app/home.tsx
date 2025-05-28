@@ -21,14 +21,14 @@ const HOME = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <LinearGradient 
-        style={styles.gradient}
-        colors={['#5028c6', '#603ec5', '#b3b0bc']}
-        locations={[0, 0.5, 1] as [number, number, number]}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}  
-      >
+    <LinearGradient 
+      style={styles.gradient}
+      colors={['#5028c6', '#603ec5', '#b3b0bc']}
+      locations={[0, 0.5, 1]}
+      start={{ x: 0.5, y: 0 }}
+      end={{ x: 0.5, y: 1 }}
+    >
+      <SafeAreaView style={styles.safeArea}>
         {/* Header com botão do menu */}
         <View style={styles.header}>
           <MenuToggleButton onPress={toggleSidebar} />
@@ -57,14 +57,15 @@ const HOME = () => {
             </View>
           </View>
 
-          <View style={styles.chartContainer}>
-            <Text style={styles.chartTitle}>Evolução Financeira</Text>
-            <GoogleChart 
-                data={chartData}
-                title="Evolução Financeira"
-                chartType="LineChart"
-            />
-          </View>
+         <View style={styles.chartContainer}>
+          <Text style={styles.chartTitle}>Evolução Financeira</Text>
+          <GoogleChart 
+            data={chartData}
+            title="Evolução Financeira"
+            chartType="LineChart"
+          />
+        </View>
+
         </ScrollView>
 
         {/* Menu Lateral */}
@@ -73,16 +74,16 @@ const HOME = () => {
           isVisible={isSidebarVisible}
           onToggle={toggleSidebar}
         />
-      </LinearGradient>
-    </SafeAreaView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  gradient: {
     flex: 1,
   },
-  gradient: {
+  safeArea: {
     flex: 1,
   },
   header: {
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingVertical: 10,
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
   },
   headerTitle: {
@@ -100,7 +101,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   headerSpacer: {
-    width: 40, // Mesmo tamanho do botão para centralizar o título
+    width: 40,
   },
   contentContainer: {
     padding: 20,
@@ -138,12 +139,14 @@ const styles = StyleSheet.create({
     fontFamily: 'KronaOne-Regular',
     fontSize: 20,
   },
-  chartContainer: {
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 12,
-    padding: 15,
-    marginBottom: 30,
-  },
+chartContainer: {
+  backgroundColor: 'rgba(255, 255, 255, 0.2)',
+  borderRadius: 12,
+  padding: 15,
+  marginBottom: 30,
+  minHeight: 300, // adicionado
+},
+
   chartTitle: {
     color: '#FFF',
     fontFamily: 'KronaOne-Regular',

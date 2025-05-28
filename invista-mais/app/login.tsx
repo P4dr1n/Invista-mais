@@ -57,7 +57,7 @@ export default function Login() {
         return;
       }
 
-      const response = await fetch('http://localhost:3000/auth/login', { // <- Adicionar /auth
+      const response = await fetch('http://10.200.8.205:3000/auth/login', { // <- Adicionar /auth
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, senha }),
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   linkText: {
-    color: '#4F29C4',
+    color: '#fff',
     textDecorationLine: 'underline',
   },
   errorText: {

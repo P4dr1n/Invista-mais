@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Text, Platform } from 'react-native';
 import { WebView } from 'react-native-webview';
-import { Chart } from 'react-google-charts'; // Adicione esta importação
+import { Chart } from 'react-google-charts';
 
 interface GoogleChartProps {
   data: Array<Array<string | number>>;
@@ -14,17 +14,17 @@ const GoogleChart: React.FC<GoogleChartProps> = ({
   title,
   chartType = 'LineChart'
 }) => {
-  // Configurações comuns
   const commonOptions = {
     title,
     titleTextStyle: {
       color: '#FFF',
-      fontSize: 16,
+      fontSize: 20,
       fontName: 'KronaOne-Regular',
     },
     legend: {
       textStyle: {
         color: '#FFF',
+        fontSize: 16,
         fontName: 'KronaOne-Regular',
       },
     },
@@ -32,34 +32,43 @@ const GoogleChart: React.FC<GoogleChartProps> = ({
     backgroundColor: 'transparent',
     curveType: 'function',
     lineWidth: 3,
-    pointSize: 5,
+    pointSize: 6,
+    hAxis: {
+      textStyle: {
+        color: '#FFF',
+        fontSize: 20,
+      },
+      title: 'Meses',
+      titleTextStyle: {
+        color: '#FFF',
+        fontSize: 20,
+      },
+    },
+    vAxis: {
+      textStyle: {
+        color: '#FFF',
+        fontSize: 18,
+      },
+      title: 'Valores (R$)',
+      titleTextStyle: {
+        color: '#FFF',
+        fontSize: 16,
+      },
+    },
+    chartArea: {
+      width: '75%',
+      height: '75%',
+      backgroundColor: 'transparent',
+    },
   };
 
-  // Versão para Web
   if (Platform.OS === 'web') {
     return (
       <View style={styles.webContainer}>
         <Chart
-          chartType="LineChart"
+          chartType={chartType}
           data={data}
-          options={{
-            ...commonOptions,
-            hAxis: {
-              textStyle: { color: '#FFF' },
-              title: 'Meses',
-              titleTextStyle: { color: '#FFF' },
-            },
-            vAxis: {
-              textStyle: { color: '#FFF' },
-              title: 'Valores (R$)',
-              titleTextStyle: { color: '#FFF' },
-            },
-            chartArea: {
-              width: '85%',
-              height: '75%',
-              backgroundColor: 'transparent',
-            },
-          }}
+          options={commonOptions}
           width="100%"
           height="400px"
         />
@@ -67,7 +76,6 @@ const GoogleChart: React.FC<GoogleChartProps> = ({
     );
   }
 
-  // Versão para Mobile usando WebView
   const htmlContent = `
     <html>
       <head>
@@ -79,24 +87,7 @@ const GoogleChart: React.FC<GoogleChartProps> = ({
           function drawChart() {
             var data = google.visualization.arrayToDataTable(${JSON.stringify(data)});
             
-            var options = ${JSON.stringify({
-              ...commonOptions,
-              chartArea: {
-                width: '85%',
-                height: '75%',
-                backgroundColor: 'transparent',
-              },
-              hAxis: {
-                textStyle: { color: '#FFF' },
-                title: 'Meses',
-                titleTextStyle: { color: '#FFF' },
-              },
-              vAxis: {
-                textStyle: { color: '#FFF' },
-                title: 'Valores (R$)',
-                titleTextStyle: { color: '#FFF' },
-              },
-            })};
+            var options = ${JSON.stringify(commonOptions)};
 
             var chart = new google.visualization.LineChart(
               document.getElementById('chart')

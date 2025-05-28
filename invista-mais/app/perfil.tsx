@@ -1,101 +1,101 @@
-import * as React from "react";
-import { Image, StyleSheet, Pressable, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { StackNavigationProp } from '@react-navigation/stack';
+import React, { useState } from "react";
+import {
+  Image,
+  StyleSheet,
+  Pressable,
+  Text,
+  View,
+  ScrollView,
+} from "react-native";
+import { StackNavigationProp } from "@react-navigation/stack";
 import { useNavigation, ParamListBase } from "@react-navigation/native";
-import SidebarNavigation, { MenuToggleButton } from '../components/VerticalMenuNavigation';
+import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
+import SidebarNavigation, { MenuToggleButton } from "../components/VerticalMenuNavigation";
 
-// Importe suas imagens corretamente (exemplo com require)
-
-// Componente temporário para seta (substitua pelo seu componente real)
-const Arrowdowncircle = ({ width, height }: { width: number; height: number }) => (
-  <View style={{ width, height, backgroundColor: 'transparent' }} />
-);
-
-const PERFIL = () => {
+const PerfilScreen = () => {
   const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
-  const [isSidebarVisible, setIsSidebarVisible] = React.useState(false);
-  const toggleSidebar = () => {
-    setIsSidebarVisible(!isSidebarVisible);
-  };
+  const [isSidebarVisible, setIsSidebarVisible] = useState(false);
+
+  const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
+
+  const ProfileButton = ({
+    text,
+    onPress,
+  }: {
+    text: string;
+    onPress?: () => void;
+  }) => (
+    <Pressable style={styles.profileButton} onPress={onPress}>
+      <Text style={styles.buttonText}>{text}</Text>
+    </Pressable>
+  );
 
   return (
-    
     <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-                  <MenuToggleButton onPress={toggleSidebar} />
-                  <Text style={styles.headerTitle}>Resumo Financeiro</Text>
-                  <View style={styles.headerSpacer} />
-                </View>
-                <SidebarNavigation
+      <LinearGradient
+        style={styles.gradient}
+        colors={["#5028c6", "#603ec5", "#b3b0bc"]}
+        locations={[0, 0.5, 1]}
+        start={{ x: 0.5, y: 0 }}
+        end={{ x: 0.5, y: 1 }}
+      >
+        <SidebarNavigation
           currentPage="perfil"
           isVisible={isSidebarVisible}
           onToggle={toggleSidebar}
         />
-      <View style={styles.headerContainer}>
-        <Pressable style={styles.profileImageWrapper}>
-          <Image 
-            style={styles.profileImage} 
-            resizeMode="cover" 
-            
-          />
-        </Pressable>
-        
-        <Text style={styles.title}>PERFIL</Text>
-        
-        <Pressable style={styles.settingsButton}>
-          <Image 
-            style={styles.icon} 
-            resizeMode="cover" 
-            
-          />
-        </Pressable>
-        
-        <Image 
-          style={styles.ellipse} 
-          resizeMode="cover" 
-         
-        />
-      </View>
-
-      <View style={styles.content}>
-        <View style={styles.section}>
-          <Pressable style={[styles.button, styles.editProfileButton]}>
-            <Text style={styles.buttonText}>EDITA PERFIL</Text>
-          </Pressable>
-          
-          <View style={[styles.button, styles.brokerSection]}>
-            <Text style={styles.buttonText}>CORRETORA DE USO:</Text>
-            <Arrowdowncircle width={36} height={43} />
-          </View>
-          
-          <View style={[styles.button, styles.investmentProfile]}>
-            <Text style={styles.buttonText}>PERFIL DE INVESTIMENTOS</Text>
-          </View>
+        {/* Header */}
+        <View style={styles.header}>
+          <MenuToggleButton onPress={toggleSidebar} />
+          <Text style={styles.headerTitle}>Perfil</Text>
+          <View style={styles.headerSpacer} />
         </View>
 
-        <Text style={styles.profileType}>CUIDADOSO</Text>
-      </View>
-      
-      
-      <Pressable 
-        style={styles.logoutButton} 
-        onPress={() => navigation.goBack()}
-        
-      >
-        <Image 
-          style={styles.icon} 
-          resizeMode="cover" 
-          
-        />
-        
-      </Pressable>
-       {/* Menu Lateral */}
-       <SidebarNavigation
+        {/* Conteúdo */}
+        <ScrollView
+          contentContainerStyle={styles.contentContainer}
+          showsVerticalScrollIndicator={false}
+        >
+         <View style={styles.avatarSection}>
+          <Image
+             // Adicione uma imagem real
+            style={styles.avatar}
+            resizeMode="cover"
+          />
+          <Text style={styles.profileName}>Nome do Usuário</Text>
+        </View>
+
+          <View style={styles.buttonGroup}>
+            <ProfileButton text="EDITAR PERFIL" />
+            <View style={styles.brokerContainer}>
+              <Text style={styles.brokerText}>CORRETORA DE USO:</Text>
+              <View style={styles.dropdownIcon}>
+                <View style={styles.dropdownPlaceholder} />
+              </View>
+            </View>
+            <ProfileButton text="PERFIL DE INVESTIMENTOS" />
+          </View>
+
+          <Text style={styles.profileType}>CUIDADOSO</Text>
+        </ScrollView>
+
+        {/* Botão de Logout */}
+        <Pressable style={styles.logoutButton} onPress={() => navigation.goBack()}>
+          <Image
+             // Adicione um ícone real
+            style={styles.logoutIcon}
+            resizeMode="contain"
+          />
+        </Pressable>
+
+        {/* Menu Lateral */}
+        <SidebarNavigation
           currentPage="perfil"
           isVisible={isSidebarVisible}
           onToggle={toggleSidebar}
         />
+      </LinearGradient>
     </SafeAreaView>
   );
 };
@@ -103,110 +103,107 @@ const PERFIL = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
   },
-  headerContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 20,
+  gradient: {
+    flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 20,
-    paddingVertical: 15,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    paddingVertical: 10,
+    backgroundColor: "rgba(255, 255, 255, 0.1)",
   },
   headerTitle: {
-    color: '#FFF',
+    color: "#FFF",
     fontSize: 20,
-    fontFamily: 'KronaOne-Regular',
-    textAlign: 'center',
+    fontFamily: "KronaOne-Regular",
+    textAlign: "center",
   },
   headerSpacer: {
-    width: 40, // Mesmo tamanho do botão para centralizar o título
+    width: 40,
   },
-  profileImageWrapper: {
-    width: 82,
-    height: 73,
-  },
-  profileImage: {
-    width: '100%',
-    height: '100%',
-  },
-  title: {
-    color: '#000',
-    fontFamily: 'KronaOne-Regular',
-    fontSize: 20,
-    flex: 1,
-    textAlign: 'center',
-  },
-  settingsButton: {
-    width: 48,
-    height: 48,
-  },
-  ellipse: {
-    width: 156,
-    height: 123,
-    position: 'absolute',
-    top: 50,
-    alignSelf: 'center',
-  },
-  icon: {
-    width: '100%',
-    height: '100%',
-  },
-  content: {
-    flex: 1,
+  contentContainer: {
     padding: 20,
+    paddingBottom: 40,
   },
-  section: {
-    marginBottom: 20,
+  avatarSection: {
+    alignItems: "center",
+    marginBottom: 30,
   },
-  button: {
-    backgroundColor: '#D9D9D9',
+  avatar: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: "#ccc",
+  },
+  profileName: {
+    marginTop: 10,
+    fontSize: 18,
+    fontFamily: "KronaOne-Regular",
+    color: "#FFF",
+  },
+  buttonGroup: {
+    gap: 15,
+    marginBottom: 30,
+  },
+  profileButton: {
+    backgroundColor: "#D9D9D9",
     borderRadius: 46,
-    padding: 15,
-    marginVertical: 10,
-    alignItems: 'center',
-  },
-  editProfileButton: {
-    width: 203,
     height: 62,
-  },
-  brokerSection: {
-    width: '100%',
-    height: 62,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  investmentProfile: {
-    width: '100%',
-    height: 62,
+    justifyContent: "center",
+    alignItems: "center",
   },
   buttonText: {
-    color: '#000',
-    fontFamily: 'KronaOne-Regular',
+    color: "#000",
+    fontFamily: "KronaOne-Regular",
     fontSize: 16,
   },
+  brokerContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#D9D9D9",
+    borderRadius: 46,
+    paddingHorizontal: 20,
+    height: 62,
+  },
+  brokerText: {
+    color: "#000",
+    fontFamily: "KronaOne-Regular",
+    fontSize: 16,
+    flex: 1,
+  },
+  dropdownIcon: {
+    width: 36,
+    height: 36,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  dropdownPlaceholder: {
+    width: 20,
+    height: 10,
+    backgroundColor: "#999",
+    borderRadius: 2,
+  },
   profileType: {
-    color: '#0551FF',
-    fontFamily: 'KronaOne-Regular',
+    color: "#0551FF",
+    fontFamily: "KronaOne-Regular",
     fontSize: 20,
-    textAlign: 'center',
-    marginTop: 20,
+    textAlign: "center",
   },
   logoutButton: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 20,
     left: 20,
     width: 56,
     height: 50,
   },
+  logoutIcon: {
+    width: "100%",
+    height: "100%",
+  },
 });
 
-export default PERFIL;
+export default PerfilScreen;

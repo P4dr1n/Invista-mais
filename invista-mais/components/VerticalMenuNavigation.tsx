@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Pressable, Animated, Dimensions } from 'react-native';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { View, Text, StyleSheet, Pressable, Animated, useWindowDimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../types/types';
-
-const { height, width } = Dimensions.get('window');
 
 interface SidebarNavigationProps {
   currentPage?: string;
@@ -19,50 +17,88 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   onToggle 
 }) => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const [slideAnim] = useState(new Animated.Value(isVisible ? 0 : -width * 0.8));
+  const { width: windowWidth, height: windowHeight } = useWindowDimensions();
+  const sidebarWidth = Math.min(windowWidth * 0.8, 300);
+  
+  // Use ref for animation to prevent memory leaks
+  const slideAnim = useRef(new Animated.Value(isVisible ? 0 : -sidebarWidth)).current;
+  const animationRef = useRef<Animated.CompositeAnimation | null>(null);
+  const isMounted = useRef(true);
 
-  React.useEffect(() => {
-    Animated.timing(slideAnim, {
-      toValue: isVisible ? 0 : -width * 0.8,
+  // Handle animation with cleanup
+  useEffect(() => {
+    isMounted.current = true;
+    
+    if (animationRef.current) {
+      animationRef.current.stop();
+    }
+
+    animationRef.current = Animated.timing(slideAnim, {
+      toValue: isVisible ? 0 : -sidebarWidth,
       duration: 300,
       useNativeDriver: true,
-    }).start();
-  }, [isVisible]);
+    });
+
+    animationRef.current.start(({ finished }) => {
+      if (finished) animationRef.current = null;
+    });
+
+    return () => {
+      isMounted.current = false;
+      if (animationRef.current) {
+        animationRef.current.stop();
+      }
+    };
+  }, [isVisible, sidebarWidth]);
 
   const navigationItems = [
     { id: 'planos', label: 'PLANOS', route: 'planos' },
     { id: 'home', label: 'HOME', route: 'home' },
     { id: 'perfil', label: 'PERFIL', route: 'perfil' },
     { id: 'faq', label: 'AJUDA / FAQ', route: 'faq' },
-    { id: 'configuracoes', label: 'CONFIGURAÇÕES', route: 'configuracoes' }
+    { id: 'configuracoes', label: 'CONFIGURAÇÕES', route: 'configuracoes' },
+    { id: 'gastos', label: 'CONTROLE\nGASTOS', route: 'gastos' }
   ];
 
-  const handleNavigation = (route: string) => {
-    if (route !== currentPage) {
-      navigation.navigate(route);
+  // Safe navigation handler with mobile-specific checks
+  const handleNavigation = useCallback((route: string) => {
+    try {
+      // Mobile-specific navigation safety
+      if (!navigation.isFocused() || !isMounted.current) return;
+      
+      if (route !== currentPage) {
+        // Reset navigation stack to prevent buildup
+        navigation.reset({
+          index: 0,
+          routes: [{ name: route as keyof RootStackParamList }],
+        });
+      }
+    } catch (error) {
+      console.error('Mobile navigation error:', error);
+    } finally {
+      if (onToggle && isMounted.current) {
+        onToggle();
+      }
     }
-    onToggle?.();
-  };
-
-  const handleBack = () => {
-    onToggle?.();
-  };
+  }, [currentPage, navigation, onToggle]);
 
   return (
     <>
-      {/* Overlay */}
+      {/* Mobile-optimized overlay */}
       {isVisible && (
         <Pressable 
-          style={styles.overlay} 
+          style={[styles.overlay, { height: windowHeight }]} 
           onPress={onToggle}
         />
       )}
       
-      {/* Sidebar */}
+      {/* Sidebar with mobile-safe dimensions */}
       <Animated.View 
         style={[
           styles.container,
           {
+            width: sidebarWidth,
+            height: windowHeight,
             transform: [{ translateX: slideAnim }]
           }
         ]}
@@ -75,7 +111,6 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
           style={styles.gradient}
         >
           <View style={styles.content}>
-            {/* Menu Items */}
             <View style={styles.menuContainer}>
               {navigationItems.map((item, index) => (
                 <Pressable
@@ -86,6 +121,7 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                     index === 0 && styles.firstMenuItem
                   ]}
                   onPress={() => handleNavigation(item.route)}
+                  android_ripple={{ color: 'rgba(255,255,255,0.3)' }}
                 >
                   <Text style={[
                     styles.menuText,
@@ -96,14 +132,6 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
                 </Pressable>
               ))}
             </View>
-
-            {/* Back Button */}
-            <Pressable 
-              style={styles.backButton}
-              onPress={handleBack}
-            >
-              <Text style={styles.backIcon}>←</Text>
-            </Pressable>
           </View>
         </LinearGradient>
       </Animated.View>
@@ -111,7 +139,6 @@ const SidebarNavigation: React.FC<SidebarNavigationProps> = ({
   );
 };
 
-// Componente do botão para abrir o menu
 export const MenuToggleButton: React.FC<{ onPress: () => void; style?: any }> = ({ 
   onPress, 
   style 
@@ -129,7 +156,6 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     zIndex: 998,
   },
@@ -137,9 +163,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
-    width: width * 0.8,
-    maxWidth: 300,
-    height: height,
     zIndex: 999,
   },
   gradient: {
@@ -149,7 +172,7 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    paddingTop: 60,
+    paddingTop: 0,
     paddingHorizontal: 20,
     paddingBottom: 40,
   },
@@ -164,6 +187,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     minHeight: 70,
     justifyContent: 'center',
+    overflow: 'hidden', // For Android ripple effect
   },
   firstMenuItem: {
     marginTop: 0,
@@ -183,19 +207,6 @@ const styles = StyleSheet.create({
   activeMenuText: {
     color: '#EAFF08',
   },
-  backButton: {
-    alignSelf: 'flex-start',
-    padding: 15,
-    borderRadius: 25,
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-    marginTop: 20,
-  },
-  backIcon: {
-    fontSize: 24,
-    color: '#FFFFFF',
-    fontWeight: 'bold',
-  },
-  // Estilos para o botão toggle
   toggleButton: {
     width: 40,
     height: 40,

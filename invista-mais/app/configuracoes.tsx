@@ -1,152 +1,157 @@
 import * as React from "react";
-import { Image, StyleSheet, Pressable, Text, View, SafeAreaView } from "react-native";
+import {
+  Image,
+  StyleSheet,
+  Pressable,
+  Text,
+  View,
+  SafeAreaView,
+  ScrollView
+} from "react-native";
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation } from "@react-navigation/native";
-import FloatingNavigation from '../components/FloatingNavigation';
+import { LinearGradient } from 'expo-linear-gradient';
 import { RootStackParamList } from '../types/types';
 import SidebarNavigation, { MenuToggleButton } from '../components/VerticalMenuNavigation';
-
-// Importe os SVGs corretamente (exemplo genérico)
-const Group49 = () => <View style={styles.svgLine} />;
-const Group50 = () => <View style={styles.svgLine} />;
-const Group51 = () => <View style={styles.svgLine} />;
-const Group511 = () => <View style={styles.svgLine} />;
 
 const Configuracoes = () => {
   const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
   const [isSidebarVisible, setIsSidebarVisible] = React.useState(false);
-      const toggleSidebar = () => {
-        setIsSidebarVisible(!isSidebarVisible);
-      };
+
+  const toggleSidebar = () => setIsSidebarVisible(!isSidebarVisible);
+
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Cabeçalho */}
-      <View style={styles.header}>
-                  <MenuToggleButton onPress={toggleSidebar} />
-                  <Text style={styles.headerTitle}></Text>
-                  <View style={styles.headerSpacer} />
-                </View>
-                <SidebarNavigation
+    <LinearGradient
+      colors={['#5028c6', '#a298b5']}
+      style={styles.container}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
+        <SidebarNavigation
           currentPage="configuracoes"
           isVisible={isSidebarVisible}
           onToggle={toggleSidebar}
         />
-      <View style={styles.header}>
-        <Image
-          style={styles.profileImage}
-          resizeMode="cover"
-          
-        />
-        <Text style={styles.title}>CONFIGURAÇÕES</Text>
-      </View>
 
-      {/* Opções de Configuração */}
-      <View style={styles.content}>
-        <Pressable style={styles.option} onPress={() => {}}>
-          <Text style={styles.optionText}>AJUDA/FAQ</Text>
-          <Group49 />
-        </Pressable>
+        {/* Cabeçalho */}
+        <View style={styles.header}>
+          <Image
+             // Substitua pela sua imagem
+            style={styles.profileImage}
+          />
+          <Text style={styles.headerTitle}>CONFIGURAÇÕES</Text>
+        </View>
 
-        <Pressable style={styles.option} onPress={() => {}}>
-          <Text style={styles.optionText}>DELETAR USUÁRIO</Text>
-          <Group50 />
-        </Pressable>
+        {/* Subtítulo */}
+        <Text style={styles.subtitle}>CONFIGURAÇÕES:</Text>
 
-        <Pressable 
-          style={styles.option} 
-          onPress={() => navigation.navigate('login')}
+        {/* Lista de opções */}
+       <ScrollView contentContainerStyle={styles.optionsContainer}>
+          {[
+            { label: 'AJUDA / FAQ', onPress: () => navigation.navigate('faq') },
+            { label: 'CONTROLE DE PRIVACIDADE', onPress: () => navigation.navigate('Privacidade') },
+            { label: 'SAIR DO USUÁRIO', onPress: () => navigation.navigate('login') },
+          ].map((item, index) => (
+            <Pressable key={index} onPress={item.onPress} style={styles.buttonOption}>
+              <Text style={styles.buttonText}>{item.label}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+
+
+        {/* Botão voltar */}
+        <Pressable
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
         >
-          <Text style={styles.optionText}>SAIR DO USUÁRIO</Text>
-          <Group51 />
+          <Image
+            // Ícone de voltar
+            style={styles.backIcon}
+          />
         </Pressable>
-
-        <Pressable style={styles.option} onPress={() => {}}>
-          <Text style={styles.optionText}>CONTROLE DE PRIVACIDADE</Text>
-          <Group511 />
-        </Pressable>
-      </View>
-
-      {/* Botão de Logout */}
-      <Pressable 
-        style={styles.logoutButton}
-        onPress={() => navigation.goBack()}
-      >
-        <Image
-          style={styles.logoutIcon}
-          resizeMode="contain"
-          
-        />
-      </Pressable>
-      {/* Menu Lateral */}
-      <SidebarNavigation
+        <SidebarNavigation
           currentPage="configuracoes"
           isVisible={isSidebarVisible}
           onToggle={toggleSidebar}
         />
-    </SafeAreaView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#5028c6',
-    padding: 20,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 40,
+    paddingHorizontal: 20,
+    marginTop: 20,
+  },
+  profileImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 10,
   },
   headerTitle: {
     color: '#FFF',
     fontSize: 20,
     fontFamily: 'KronaOne-Regular',
+  },
+  subtitle: {
     textAlign: 'center',
-  },
-  headerSpacer: {
-    width: 40, // Mesmo tamanho do botão para centralizar o título
-  },
-  profileImage: {
-    width: 82,
-    height: 73,
-    borderRadius: 8,
-    marginRight: 20,
-  },
-  title: {
-    color: '#FFF',
-    fontSize: 24,
+    color: 'yellow',
+    fontSize: 16,
+    marginTop: 30,
+    marginBottom: 20,
     fontFamily: 'KronaOne-Regular',
   },
-  content: {
-    flex: 1,
-    gap: 30,
+  optionsContainer: {
+    paddingHorizontal: 30,
   },
   option: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 15,
-    borderBottomWidth: 2,
-    borderBottomColor: '#FFF',
+    marginBottom: 25,
   },
   optionText: {
     color: '#FFF',
     fontSize: 18,
+    textAlign: 'center',
     fontFamily: 'KronaOne-Regular',
   },
-  svgLine: {
-    height: 2,
+  buttonOption: {
+  backgroundColor: '#4F29C4',
+  paddingVertical: 15,
+  paddingHorizontal: 20,
+  borderRadius: 30,
+  marginBottom: 20,
+  alignItems: 'center',
+  elevation: 4, // sombra Android
+  shadowColor: '#000', // sombra iOS
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.3,
+  shadowRadius: 3,
+},
+buttonText: {
+  color: '#FFF',
+  fontSize: 16,
+  fontFamily: 'KronaOne-Regular',
+},
+
+  line: {
+    height: 1,
     backgroundColor: '#FFF',
-    width: '100%',
+    marginTop: 8,
   },
-  logoutButton: {
-    alignSelf: 'flex-start',
-    padding: 10,
+  backButton: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
   },
-  logoutIcon: {
-    width: 56,
-    height: 50,
+  backIcon: {
+    width: 30,
+    height: 30,
+    tintColor: '#FFF',
   },
 });
 
