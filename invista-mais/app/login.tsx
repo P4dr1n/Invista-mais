@@ -57,7 +57,7 @@ export default function Login() {
         return;
       }
 
-      const response = await fetch('http://10.200.8.205:3000/auth/login', { // <- Adicionar /auth
+      const response = await fetch('http://192.168.1.7:3000/auth/login', { // <- Adicionar /auth
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, senha }),

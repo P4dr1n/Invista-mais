@@ -29,50 +29,55 @@ const ValidarCodigoScreen = () => {
   }, [route.params]);
 
   const handleValidar = async () => {
-    try {
-      if (!codigo || codigo.length !== 6) {
-        Alert.alert('Erro', 'Digite um código válido de 6 dígitos');
-        return;
-      }
-
-      const response = await fetch('http://localhost:3000/verificacao/verificar-codigo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, codigo }),
-      });
-
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.mensagem || 'Erro na verificação');
-      }
-
-      if (data.success) {
-        navigation.navigate('RedefinirSenha', { email });
-      }
-    } catch (error: any) {
-      Alert.alert('Erro', error.message || 'Falha na verificação');
+  try {
+    if (!codigo || codigo.length !== 6) {
+      Alert.alert('Erro', 'Digite um código válido de 6 dígitos');
+      return;
     }
-  };
 
-  const handleReenviar = async () => {
-    try {
-      const response = await fetch('http://localhost:3000/verificacao/solicitar-codigo', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email,codigo }),
-      });
+    const response = await fetch('http://192.168.1.7:3000/verificacao/verificar-codigo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, codigo }),
+    });
 
-      if (!response.ok) {
-        throw new Error('Falha ao reenviar código');
-      }
-
-      Alert.alert('Sucesso', 'Novo código enviado para seu e-mail!');
-    } catch (error) {
-      Alert.alert('Erro', 'Falha ao reenviar código');
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.mensagem || 'Erro na verificação');
     }
-  };
 
+    // Verifica se a resposta é bem-sucedida
+    if (data.success) {
+      // Navega para a tela apropriada
+      navigation.navigate('login'); // Ou 'RedefinirSenha' conforme necessário
+    } else {
+      Alert.alert('Erro', data.mensagem || 'Falha na verificação');
+    }
+  } catch (error: any) {
+    Alert.alert('Erro', error.message || 'Falha na verificação');
+  }
+};
+
+ const handleReenviar = async () => {
+  try {
+    const response = await fetch('http://192.168.1.7:3000/verificacao/solicitar-codigo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }), // Apenas email, sem código
+    });
+
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.mensagem || 'Falha ao reenviar código');
+    }
+
+    Alert.alert('Sucesso', 'Novo código enviado para seu e-mail!');
+  } catch (error: any) {
+    Alert.alert('Erro', error.message || 'Falha ao reenviar código');
+  }
+};
   if (!email) {
     return (
       <SafeAreaView style={styles.container}>

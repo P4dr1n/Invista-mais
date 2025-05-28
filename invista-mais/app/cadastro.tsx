@@ -252,7 +252,7 @@ const Cadastro = () => {
 
       console.log('Dados enviados:', dadosParaEnvio);
 
-      const response = await fetch(`http://localhost:3000/auth/cadastro`, {
+      const response = await fetch(`http://192.168.1.7:3000/auth/cadastro`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dadosParaEnvio),

@@ -2,6 +2,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const pool = require('../config/db');
 require('dotenv').config();
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // Função compartilhada para envio de e-mail de verificação
 const enviarCodigoVerificacao = async (email) => {
@@ -15,8 +17,14 @@ const enviarCodigoVerificacao = async (email) => {
       [email, codigo]
     );
 
-    // Aqui iria a lógica de envio de e-mail com SendGrid ou outro serviço
-    console.log(`Código de verificação para ${email}: ${codigo}`);
+    // Adicione o envio real de email
+    const msg = {
+      to: email,
+      from: process.env.EMAIL_FROM,
+      subject: 'Confirmação de Cadastro',
+      html: `<h2>Seu código de verificação:</h2><h1>${codigo}</h1>`
+    };
+    await sgMail.send(msg);
     
     return true;
   } catch (error) {
@@ -24,7 +32,6 @@ const enviarCodigoVerificacao = async (email) => {
     throw new Error('Falha no envio do código de verificação');
   }
 };
-
 exports.cadastro = async (req, res) => {
   const connection = await pool.getConnection();
   try {
