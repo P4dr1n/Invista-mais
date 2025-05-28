@@ -1,201 +1,296 @@
 import * as React from "react";
-import { Image, StyleSheet, Text, Pressable, View, StyleProp, ViewStyle } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { 
+  StyleSheet, 
+  Text, 
+  View, 
+  SafeAreaView, 
+  ScrollView, 
+  TextInput, 
+  Pressable,
+  ActivityIndicator,
+  Image
+} from "react-native";
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useNavigation, ParamListBase } from "@react-navigation/native";
+import { MaterialIcons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 
-// Interface para props dos componentes SVG
-interface SVGProps {
-  width?: number;
-  height?: number;
-  style?: StyleProp<ViewStyle>;
-}
-
-// Componentes SVG com tipagem adequada
-const Group49: React.FC<SVGProps> = ({ width, height, style }) => (
-  <View style={[styles.svgLine, { width, height }, style]} />
-);
-
-const Edit: React.FC<SVGProps> = ({ width, height, style }) => (
-  <View style={[styles.editIconBase, { width, height }, style]} />
-);
-
-const Group50: React.FC<SVGProps> = ({ width, height, style }) => (
-  <View style={[styles.svgLine, { width, height }, style]} />
-);
-
-const Edit1: React.FC<SVGProps> = ({ width, height, style }) => (
-  <View style={[styles.editIconBase, { width, height }, style]} />
-);
-
-const Group51: React.FC<SVGProps> = ({ width, height, style }) => (
-  <View style={[styles.svgLine, { width, height }, style]} />
-);
-
-const Edit2: React.FC<SVGProps> = ({ width, height, style }) => (
-  <View style={[styles.editIconBase, { width, height }, style]} />
-);
-
-// Importe suas imagens
-
-
-const EDITARPERFIL = () => {
+const EditarPerfil = () => {
   const navigation = useNavigation<StackNavigationProp<ParamListBase>>();
+  const [loading, setLoading] = React.useState(false);
+  const [userData, setUserData] = React.useState({
+    name: "Maria Silva",
+    email: "maria.silva@email.com",
+    cpf: "123.456.789-00",
+    phone: "(11) 98765-4321",
+    birthDate: "15/01/1990",
+    profileImage: null as string | null,
+    broker: "XP Investimentos"
+  });
+
+  const [tempData, setTempData] = React.useState({ ...userData });
+
+  const handleSave = () => {
+    setLoading(true);
+    // Simulação de salvamento
+    setTimeout(() => {
+      setUserData({ ...tempData });
+      setLoading(false);
+      navigation.goBack();
+    }, 1500);
+  };
+
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setTempData({...tempData, profileImage: result.assets[0].uri});
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
-      <LinearGradient
-        colors={['#5028c6', '#6f54c3', '#b3b0bc']}
-        locations={[0, 0.5, 1]}
-        start={{ x: 0.5, y: 0 }}
-        end={{ x: 0.5, y: 1 }}
-        style={styles.gradient}
-      >
-        {/* Header */}
-        <View style={styles.header}>
-          <Image
-            style={styles.profileImage}
-            resizeMode="cover"
-            
+      {/* Cabeçalho */}
+      <View style={styles.header}>
+        <Pressable onPress={() => navigation.goBack()} style={styles.backButton}>
+          <MaterialIcons name="arrow-back" size={28} color="#FFF" />
+        </Pressable>
+        <Text style={styles.headerTitle}>EDITAR PERFIL</Text>
+        <Pressable style={styles.saveButton} onPress={handleSave} disabled={loading}>
+          {loading ? (
+            <ActivityIndicator size="small" color="#EAFF08" />
+          ) : (
+            <Text style={styles.saveText}>SALVAR</Text>
+          )}
+        </Pressable>
+      </View>
+
+      <ScrollView contentContainerStyle={styles.content}>
+        {/* Foto de Perfil */}
+        <Pressable style={styles.profileImageContainer} onPress={pickImage}>
+          {tempData.profileImage ? (
+            <Image source={{ uri: tempData.profileImage }} style={styles.profileImage} />
+          ) : (
+            <View style={styles.profileImagePlaceholder}>
+              <MaterialIcons name="person" size={50} color="#5028C6" />
+            </View>
+          )}
+          <View style={styles.editPhotoButton}>
+            <MaterialIcons name="edit" size={18} color="#5028C6" />
+          </View>
+        </Pressable>
+
+        {/* Campos do Formulário */}
+        <View style={styles.formGroup}>
+          <Text style={styles.inputLabel}>NOME COMPLETO</Text>
+          <TextInput
+            style={styles.input}
+            value={tempData.name}
+            onChangeText={(text) => setTempData({...tempData, name: text})}
+            placeholderTextColor="#AAA"
           />
-          
-          <Text style={styles.title}>EDITAR PERFIL</Text>
-          
-          <Pressable style={styles.settingsButton}>
-            <Image
-              style={styles.icon}
-              resizeMode="cover"
-              
-            />
+        </View>
+
+        <View style={styles.formGroup}>
+          <Text style={styles.inputLabel}>E-MAIL</Text>
+          <TextInput
+            style={styles.input}
+            value={tempData.email}
+            onChangeText={(text) => setTempData({...tempData, email: text})}
+            keyboardType="email-address"
+            placeholderTextColor="#AAA"
+          />
+        </View>
+
+        <View style={styles.formGroup}>
+          <Text style={styles.inputLabel}>CPF</Text>
+          <TextInput
+            style={styles.input}
+            value={tempData.cpf}
+            onChangeText={(text) => setTempData({...tempData, cpf: text})}
+            keyboardType="numeric"
+            placeholderTextColor="#AAA"
+          />
+        </View>
+
+        <View style={styles.formGroup}>
+          <Text style={styles.inputLabel}>TELEFONE</Text>
+          <TextInput
+            style={styles.input}
+            value={tempData.phone}
+            onChangeText={(text) => setTempData({...tempData, phone: text})}
+            keyboardType="phone-pad"
+            placeholderTextColor="#AAA"
+          />
+        </View>
+
+        <View style={styles.formGroup}>
+          <Text style={styles.inputLabel}>DATA DE NASCIMENTO</Text>
+          <TextInput
+            style={styles.input}
+            value={tempData.birthDate}
+            onChangeText={(text) => setTempData({...tempData, birthDate: text})}
+            placeholder="DD/MM/AAAA"
+            placeholderTextColor="#AAA"
+          />
+        </View>
+
+        <View style={styles.formGroup}>
+          <Text style={styles.inputLabel}>CORRETORA</Text>
+          <Pressable style={styles.brokerButton}>
+            <Text style={styles.brokerText}>{tempData.broker}</Text>
+            <MaterialIcons name="arrow-drop-down" size={24} color="#EAFF08" />
           </Pressable>
         </View>
 
-        {/* Formulário de Edição */}
-        <View style={styles.formContainer}>
-          <Text style={styles.sectionTitle}>EDITAR:</Text>
-          
-          {/* Campo Cadastro */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>CADASTRO</Text>
-            <Group49 width={344} height={2} />
-            <Edit width={24} height={24} style={styles.editIcon} />
-          </View>
-
-          {/* Campo Foto */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>FOTO</Text>
-            <Group50 width={344} height={2} />
-            <Edit1 width={24} height={24} style={styles.editIcon} />
-          </View>
-
-          {/* Campo Corretora */}
-          <View style={styles.inputGroup}>
-            <Text style={styles.inputLabel}>CORRETORA</Text>
-            <Group51 width={344} height={2} />
-            <Edit2 width={24} height={24} style={styles.editIcon} />
-          </View>
-        </View>
-
-        {/* Botão de Logout */}
-        <Pressable
-          style={styles.logoutButton}
-          onPress={() => navigation.goBack()}
+        {/* Botão para Alterar Senha */}
+        <Pressable 
+          style={styles.changePasswordButton}
+          onPress={() => navigation.navigate('AlterarSenha')}
         >
-          <Image
-            style={styles.logoutIcon}
-            resizeMode="cover"
-            
-          />
+          <Text style={styles.changePasswordText}>ALTERAR SENHA</Text>
+          <MaterialIcons name="chevron-right" size={24} color="#5028C6" />
         </Pressable>
-      </LinearGradient>
+      </ScrollView>
     </SafeAreaView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  gradient: {
-    flex: 1,
-    padding: 20,
+    backgroundColor: '#5028c6',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 40,
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+    backgroundColor: 'rgba(80, 40, 198, 0.9)',
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 5,
+    elevation: 8,
+    zIndex: 10,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerTitle: {
+    color: '#FFF',
+    fontSize: 20,
+    fontFamily: 'KronaOne-Regular',
+    textAlign: 'center',
+    flex: 1,
+  },
+  saveButton: {
+    backgroundColor: 'rgba(234, 255, 8, 0.2)',
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 10,
+  },
+  saveText: {
+    color: '#EAFF08',
+    fontSize: 16,
+    fontFamily: 'KronaOne-Regular',
+  },
+  content: {
+    padding: 20,
+    paddingBottom: 80,
+    alignItems: 'center',
+  },
+  profileImageContainer: {
+    position: 'relative',
+    marginBottom: 30,
+  },
+  profileImagePlaceholder: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#EAFF08',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   profileImage: {
-    width: 82,
-    height: 73,
-    borderRadius: 8,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 3,
+    borderColor: '#EAFF08',
   },
-  title: {
-    color: '#FFF',
-    fontFamily: 'KronaOne-Regular',
-    fontSize: 20,
-    flex: 1,
-    textAlign: 'center',
+  editPhotoButton: {
+    position: 'absolute',
+    bottom: 5,
+    right: 5,
+    backgroundColor: '#EAFF08',
+    width: 35,
+    height: 35,
+    borderRadius: 17.5,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  settingsButton: {
-    width: 48,
-    height: 48,
-  },
-  icon: {
+  formGroup: {
     width: '100%',
-    height: '100%',
-  },
-  formContainer: {
-    flex: 1,
-    gap: 30,
-  },
-  sectionTitle: {
-    color: '#eaff08',
-    fontFamily: 'KronaOne-Regular',
-    fontSize: 20,
-    marginBottom: 20,
-  },
-  inputGroup: {
-    gap: 10,
-    position: 'relative',
+    marginBottom: 25,
   },
   inputLabel: {
-    color: '#FFF',
+    color: '#EAFF08',
+    fontSize: 14,
     fontFamily: 'KronaOne-Regular',
-    fontSize: 18,
+    marginBottom: 8,
   },
-  svgLine: {
-    backgroundColor: '#FFF',
-    height: 2,
+  input: {
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 15,
+    padding: 15,
+    color: '#FFF',
+    fontSize: 16,
+    fontFamily: 'KronaOne-Regular',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
   },
-  editIconBase: {
-    position: 'absolute',
-    right: 0,
-    top: '50%',
-    backgroundColor: '#FFF',
-    borderRadius: 12,
+  brokerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    borderRadius: 15,
+    padding: 15,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
   },
-  editIcon: {
-    marginTop: -12, // Ajuste fino para posicionamento
+  brokerText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontFamily: 'KronaOne-Regular',
   },
-  logoutButton: {
-    position: 'absolute',
-    bottom: 20,
-    left: 20,
-    width: 56,
-    height: 50,
-  },
-  logoutIcon: {
+  changePasswordButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(234, 255, 8, 0.2)',
+    borderRadius: 15,
+    padding: 15,
     width: '100%',
-    height: '100%',
+    marginTop: 10,
   },
-  svgPlaceholder: {
-    backgroundColor: '#ffffff30',
-    height: 2,
-    width: '100%',
-    marginVertical: 8,
+  changePasswordText: {
+    color: '#EAFF08',
+    fontSize: 16,
+    fontFamily: 'KronaOne-Regular',
   },
 });
 
-export default EDITARPERFIL;
+export default EditarPerfil;
