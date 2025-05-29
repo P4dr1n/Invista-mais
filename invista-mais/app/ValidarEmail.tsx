@@ -14,7 +14,11 @@ type ValidarEmailScreenNavigationProp = StackNavigationProp<RootStackParamList, 
           
             const handleEnviarCodigo = async () => {
           try {
+<<<<<<< HEAD
             const response = await fetch('http://10.200.8.194:3000/verificacao/solicitar-codigo', { // <- Novo caminho
+=======
+            const response = await fetch('http://192.168.1.7:3000/verificacao/solicitar-codigo', { // <- Novo caminho
+>>>>>>> 0dfbf2976c81f9edb23d49f3200dd84cedb46664
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ email }),

@@ -32,6 +32,7 @@ CREATE TABLE enderecos (
 );
 
 -- Tabela de Códigos com relação direta ao usuário
+<<<<<<< HEAD
 CREATE TABLE `codigos_verificacao` (
   id int(11) NOT NULL,
   email varchar(255) NOT NULL,
@@ -40,6 +41,20 @@ CREATE TABLE `codigos_verificacao` (
   utilizado tinyint(1) DEFAULT 0,
   created_at timestamp NOT NULL DEFAULT current_timestamp()
 ) 
+=======
+
+ CREATE TABLE codigos_verificacao (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  email VARCHAR(255) NOT NULL,          -- Coluna EMAIL mantida
+  codigo VARCHAR(6) NOT NULL,
+  expira_em DATETIME NOT NULL,
+  usado BOOLEAN DEFAULT FALSE,
+  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_expiracao (expira_em)       -- Índice para limpeza periódica
+);
+  
+
+>>>>>>> 0dfbf2976c81f9edb23d49f3200dd84cedb46664
 
 -- Tabela de Custo de Vida com estrutura normalizada
 CREATE TABLE CustoVidaClasseMedia (
