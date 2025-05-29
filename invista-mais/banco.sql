@@ -35,16 +35,15 @@ CREATE TABLE enderecos (
 
  CREATE TABLE codigos_verificacao (
   id INT AUTO_INCREMENT PRIMARY KEY,
-  email VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,          -- Coluna EMAIL mantida
   codigo VARCHAR(6) NOT NULL,
   expira_em DATETIME NOT NULL,
   usado BOOLEAN DEFAULT FALSE,
-  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-  INDEX idx_expiracao (expira_em)  -- Índice para limpeza periódica
+  criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX idx_expiracao (expira_em)       -- Índice para limpeza periódica
 );
   
-);
+
 
 -- Tabela de Custo de Vida com estrutura normalizada
 CREATE TABLE CustoVidaClasseMedia (
