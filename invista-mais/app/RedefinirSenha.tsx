@@ -44,7 +44,7 @@ const RedefinirSenhaScreen = ({ navigation }: RedefinirSenhaScreenProps) => {
         return;
       }
 
-      const response = await fetch('http://localhost:3000/auth/redefinir-senha', {
+      const response = await fetch('http://10.200.8.194:3000/auth/redefinir-senha', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

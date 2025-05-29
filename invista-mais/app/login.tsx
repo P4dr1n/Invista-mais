@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   View, 
   Text, 
@@ -10,11 +10,8 @@ import {
   ActivityIndicator
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { KronaOne_400Regular } from '@expo-google-fonts/krona-one';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../types/types';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 
@@ -25,21 +22,10 @@ export default function Login() {
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
   const [fontsLoaded] = useFonts({
     KronaOne_400Regular,
   });
-
-  useEffect(() => {
-    const verificarLogin = async () => {
-      const token = await AsyncStorage.getItem('token');
-      if (token) {
-        navigation.navigate('Home');
-      }
-    };
-    verificarLogin();
-  }, []);
 
   const handleLogin = async () => {
     try {
@@ -57,7 +43,7 @@ export default function Login() {
         return;
       }
 
-      const response = await fetch('http://10.200.8.205:3000/auth/login', { // <- Adicionar /auth
+      const response = await fetch('http://192.168.1.7:3000/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, senha }),
@@ -70,8 +56,11 @@ export default function Login() {
           setEmailError('E-mail não cadastrado');
         } else if (data.code === 'INVALID_PASSWORD') {
           setPasswordError('Senha incorreta');
-        } else if (data.mensagem.includes('Confirme seu e-mail')) {
-          navigation.navigate('ValidarEmail', { email });
+        } else if (data.mensagem && data.mensagem.includes('Confirme seu e-mail')) {
+          router.push({
+            pathname: '/ValidarEmail',
+            params: { email }
+          });
         } else {
           Alert.alert('Erro', data.mensagem || 'Erro no login');
         }
@@ -81,11 +70,10 @@ export default function Login() {
       // Login bem-sucedido
       await AsyncStorage.setItem('token', data.token);
       await AsyncStorage.setItem('usuario', JSON.stringify({
-        id: data.usuario.id, // ← Garanta que o backend envia o ID
+        id: data.usuario.id,
         nome: data.usuario.nome,
         email: data.usuario.email,
-        
-      }))
+      }));
 
       router.replace('/home');
 
@@ -122,7 +110,6 @@ export default function Login() {
           <View style={styles.form}>
             <TextInput
               placeholderTextColor="#d4d4d4"
-              
               style={[styles.input, emailError ? styles.inputError : null]}
               placeholder="E-mail"
               value={email}
@@ -167,14 +154,17 @@ export default function Login() {
 
             <TouchableOpacity 
               style={styles.link}
-              onPress={() => navigation.navigate('ValidarEmail', { email })}
+              onPress={() => router.push({
+                pathname: '/ValidarEmail',
+                params: { email }
+              })}
             >
               <Text style={styles.linkText}>Esqueci a senha</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
               style={styles.link}
-              onPress={() => navigation.navigate('cadastro')}
+              onPress={() => router.push('/cadastro')}
             >
               <Text style={styles.linkText}>Criar nova conta</Text>
             </TouchableOpacity>

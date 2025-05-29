@@ -1,12 +1,10 @@
 import { Pressable, Image, StyleSheet, Text, View, Dimensions } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
+import { router } from 'expo-router';
 
 const { width, height } = Dimensions.get('window');
 
 export default function Index() {
-  const navigation = useNavigation();
-
   return (
     <LinearGradient
       colors={['#3B0CC8', '#562ECE', '#7352D5', '#AE9DE2']}
@@ -21,7 +19,7 @@ export default function Index() {
         
         <Pressable 
           style={styles.button}
-          onPress={() => navigation.navigate('login' as never)}
+          onPress={() => router.push('/login')}
         >
           <Text style={styles.buttonText}>LOGIN</Text>
           <Image
@@ -32,7 +30,7 @@ export default function Index() {
 
         <Pressable 
           style={styles.button}
-          onPress={() => navigation.navigate('cadastro' as never)}
+          onPress={() => router.push('/cadastro')}
         >
           <Text style={styles.buttonText}>CADASTRAR</Text>
           <Image

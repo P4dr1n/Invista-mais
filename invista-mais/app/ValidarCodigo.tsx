@@ -35,7 +35,7 @@ const ValidarCodigoScreen = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:3000/verificacao/verificar-codigo', {
+      const response = await fetch('http://10.200.8.194:3000/verificacao/verificar-codigo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, codigo }),
@@ -57,7 +57,7 @@ const ValidarCodigoScreen = () => {
 
   const handleReenviar = async () => {
     try {
-      const response = await fetch('http://localhost:3000/verificacao/solicitar-codigo', {
+      const response = await fetch('http://10.200.8.194:3000/verificacao/solicitar-codigo', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email,codigo }),

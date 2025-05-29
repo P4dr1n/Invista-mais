@@ -32,15 +32,14 @@ CREATE TABLE enderecos (
 );
 
 -- Tabela de Códigos com relação direta ao usuário
-CREATE TABLE codigos_verificacao (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  usuario_id INT NOT NULL,
-  codigo VARCHAR(6) NOT NULL,
-  expira_em DATETIME NOT NULL,
-  utilizado BOOLEAN DEFAULT 0,
-  FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-  INDEX idx_expiracao (expira_em)  -- Índice para limpeza periódica
-);
+CREATE TABLE `codigos_verificacao` (
+  id int(11) NOT NULL,
+  email varchar(255) NOT NULL,
+  codigo varchar(6) NOT NULL,
+  expira_em datetime NOT NULL,
+  utilizado tinyint(1) DEFAULT 0,
+  created_at timestamp NOT NULL DEFAULT current_timestamp()
+) 
 
 -- Tabela de Custo de Vida com estrutura normalizada
 CREATE TABLE CustoVidaClasseMedia (
